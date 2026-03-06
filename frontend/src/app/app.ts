@@ -1,10 +1,9 @@
 import { Component, signal } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
-import { RaceForm } from './components/race-form/race-form';
+import { NavBar } from './components/nav-bar/nav-bar';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink],
+  imports: [NavBar],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

@@ -1,0 +1,15 @@
+<form [formGroup]="lotsForm" (ngSubmit)="onSubmit()">
+    <label for="date-achat">Date achat:</label>
+    <input type="date" id="date-achat" formControlName="date-achat" />
+
+    <label for="nbr-akoho">Nombre akoho :</label>
+    <input type="number" id="nbr-akoho" formControlName="nbr-akoho" step="0.01" />
+
+    <label for="age">Age (semaine):</label>
+    <input type="number" id="age" formControlName="age" />
+
+    <label for="prix-achat">Prix achat :</label>
+    <input type="number" id="prix-achat" formControlName="prix-achat" step="0.01" />
+
+    <button type="submit">Submit</button>
+</form>
