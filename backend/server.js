@@ -1,10 +1,15 @@
-const express = require('express');
-const { connectDB } = require('./config/db');
+import express from "express";
+import cors from "cors";
+import LotsRoutes from "./routes/LotRoutes";
 
 const app = express();
+const PORT = 3000;
 
-connectDB();
+app.use(cors());
+app.use(express.json());    
 
-app.listen(3000, () => {
-    console.log("Serveur lancé sur le port 3000");
+app.use("/api/lots", LotsRoutes);
+
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });

@@ -1,0 +1,1 @@
+INSERT INTO Race (nom, pu_sakafo_par_gramme, pv_par_gramme, pu_atody) VALUES ('Pondeuse Rouge', 0.05, 0.10, 500),('Leghorn', 0.04, 0.09, 450),('Plymouth Rock', 0.06, 0.11, 520);
