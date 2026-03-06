@@ -15,7 +15,7 @@ export class LotsForm {
     this.lotsForm = this.fb.group({
       'date-achat': ['', Validators.required],
       'nbr-akoho': [0, Validators.required],
-      age: [0, Validators.required],
+      'age': [0, Validators.required],
       'prix-achat': [0, Validators.required]
     });
   }

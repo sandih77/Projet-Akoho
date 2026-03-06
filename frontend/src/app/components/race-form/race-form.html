@@ -1,15 +1,15 @@
-<form action="">
+<form [formGroup]="raceForm" (ngSubmit)="onSubmit()">
     <label for="name">Name:</label>
-    <input type="text" id="name" name="name" />
+    <input type="text" id="name" name="name" formControlName="nom" />
     
     <label for="prix-sakafo">Prix sakafo par gramme :</label>
-    <input type="number" id="prix-sakafo" name="prix-sakafo" step="0.01" />
+    <input type="number" id="prix-sakafo" name="prix-sakafo" step="0.01" formControlName="pu_sakafo_par_gramme" />
 
     <label for="prix-vente">Prix de vente par gramme :</label>
-    <input type="number" id="prix-vente" name="prix-vente" step="0.01" />
+    <input type="number" id="prix-vente" name="prix-vente" step="0.01" formControlName="pv_par_gramme" />
 
     <label for="prix-atody">Prix unitaire oeuf :</label>
-    <input type="number" id="prix-atody" name="prix-atody" step="0.01" />
+    <input type="number" id="prix-atody" name="prix-atody" step="0.01" formControlName="pu_atody" />
     
     <button type="submit">Submit</button>
 </form>
