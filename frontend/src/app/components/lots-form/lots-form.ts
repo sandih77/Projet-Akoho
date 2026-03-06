@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-lots-form',
+  imports: [BrowserModule, ReactiveFormsModule],
   templateUrl: './lots-form.html',
   styleUrls: ['./lots-form.css']
 })
