@@ -44,4 +44,17 @@ export default class AtodyModel {
             throw err;
         }
     }
+
+    static async getNbrAtodyByLot(lot_id) {
+        try {
+            const pool = await Database.getPool();
+            request.input('lot_id', lot_id);
+            const result = await pool.request().query(`
+                SELECT SUM(nombre_atody) FROM Atody WHERE lot_id = @lot_id
+            `);
+            return result.recordset;
+        } catch (err) {
+            throw err;
+        }
+    }
 }

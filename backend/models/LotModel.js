@@ -1,3 +1,4 @@
+import { pool } from "mssql";
 import Database from "../config/db.js";
 
 export default class LotModel {
@@ -47,6 +48,17 @@ export default class LotModel {
             return result.recordset;
         } catch (err) {
             console.error('Erreur récupération lots:', err);
+            throw err;
+        }
+    }
+
+    static async getNbrAkoho() {
+        try {
+            const pool = await pool.request().query(`
+                SELECT nombre_akoho FROM Lot;    
+            `);
+            return result.recordset;
+        } catch (err) {
             throw err;
         }
     }
