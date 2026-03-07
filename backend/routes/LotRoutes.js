@@ -1,7 +1,17 @@
 import express from "express";
 import LotController from "../controllers/LotController.js";
-const router = express.Router();
 
-router.post("/create-lot", LotController.create);
+export default class LotRoutes {
+  constructor() {
+    this.router = express.Router();
+    this.initRoutes();
+  }
 
-export default router;
+  initRoutes() {
+    this.router.post("/create-lot", LotController.create);
+  }
+
+  getRouter() {
+    return this.router;
+  }
+}

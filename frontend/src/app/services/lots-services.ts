@@ -8,7 +8,7 @@ import { Lots } from '../models/lot.models';
 export class LotsServices {
   private apiUrl = 'http://localhost:3000/api/lots';
   constructor(private http: HttpClient) { }
-  create(lot : Lots) {
+  create(lot: Lots) {
     return this.http.post(`${this.apiUrl}/create-lot`, lot);
   }
 }

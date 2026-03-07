@@ -1,26 +1,25 @@
-import Database from "../config/db.js";
+import Database from '../config/db.js';
 
-const db = Database.getSql();
+export default class RaceModel {
+    static async create(raceData) {
+        try {
+            const pool = await Database.getPool(); // récupère la connexion
+            const request = pool.request();
 
-class RaceModel {
-    constructor(nom, pu_sakafo_par_gramme, pv_par_gramme, pu_atody) {
-        this.nom = nom;
-        this.pu_sakafo_par_gramme = pu_sakafo_par_gramme;
-        this.pv_par_gramme = pv_par_gramme;
-        this.pu_atody = pu_atody;
-    }
+            request.input('nom', Database.getSql().VarChar, raceData.nom);
+            request.input('pu_sakafo_par_gramme', Database.getSql().Decimal(10, 2), raceData.pu_sakafo_par_gramme);
+            request.input('pv_par_gramme', Database.getSql().Decimal(10, 2), raceData.pv_par_gramme);
+            request.input('pu_atody', Database.getSql().Decimal(10, 2), raceData.pu_atody);
 
-    static create(race, result) {
-        const sql = "INSERT INTO Race (nom, pu_sakafo_par_gramme, pv_par_gramme, pu_atody) VALUES (?, ?, ?, ?)";
-        db.query(sql, [race.nom, race.pu_sakafo_par_gramme, race.pv_par_gramme, race.pu_atody], (err, res) => {
-            if (err) {
-                console.error("Error creating race: ", err);
-                result(err, null);
-                return;
-            }
-            console.log("Created race: ", { id: res.insertId, ...race });
-            result(null, { id: res.insertId, ...race });
-        });
+            await request.query(
+                `INSERT INTO Race (nom, pu_sakafo_par_gramme, pv_par_gramme, pu_atody)
+         VALUES (@nom, @pu_sakafo_par_gramme, @pv_par_gramme, @pu_atody)`
+            );
+
+            return { message: 'Race créée avec succès !', race: raceData };
+        } catch (err) {
+            console.error('Erreur création race:', err);
+            throw err;
+        }
     }
 }
-export default RaceModel;

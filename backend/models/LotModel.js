@@ -1,6 +1,6 @@
-import Darabase from "../config/db.js";
+import Database from "../config/db.js";
 
-const db = Darabase.getSql();
+const db = Database.getSql();
 
 class LotModel {
     constructor(name, race_id, date_achat, nombre_akoho, age, prix_achat) {

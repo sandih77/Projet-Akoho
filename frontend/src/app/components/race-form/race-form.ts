@@ -1,17 +1,18 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RaceService } from '../../services/race.services';
 
 @Component({
   selector: 'app-race-form',
   imports: [ReactiveFormsModule],
   templateUrl: './race-form.html',
-  styleUrl: './race-form.css',
+  styleUrls: ['./race-form.css'],
 })
 
 export class RaceForm {
   raceForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private raceService: RaceService) {
     this.raceForm = this.fb.group({
       'nom': ['', Validators.required],
       'pu_sakafo_par_gramme': [0, Validators.required],
@@ -22,8 +23,14 @@ export class RaceForm {
 
   onSubmit() {
     if (this.raceForm.valid) {
-      console.log('Données du formulaire:', this.raceForm.value);
-      // Ici, tu peux appeler ton API Node.js pour envoyer les données
+      this.raceService.createRace(this.raceForm.value).subscribe({
+        next: (res) => {
+          console.log('Race créée:', res);
+        },
+        error: (err) => {
+          console.error('Erreur lors de la création:', err);
+        }
+      });
     } else {
       console.log('Formulaire invalide !');
     }
