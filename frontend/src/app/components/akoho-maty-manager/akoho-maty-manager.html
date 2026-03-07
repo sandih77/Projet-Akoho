@@ -1,34 +1,44 @@
-<div class="akoho-maty-manager">
-  <h2>Gestion de la Mortalité (Akoho Maty)</h2>
-  
-  <div class="form-section">
-    <h3>Ajouter une mortalité</h3>
+<div class="page-header">
+  <div class="page-icon"><i class="fas fa-skull-crossbones"></i></div>
+  <h2>Mortalité (Akoho Maty)</h2>
+</div>
+
+<div class="two-col">
+
+  <!-- Form card -->
+  <div class="card">
+    <h3 class="card-title"><i class="fas fa-plus-circle"></i> Nouvelle Mortalité</h3>
+    <div *ngIf="message" class="alert alert-success"><i class="fas fa-check-circle"></i> {{ message }}</div>
     <app-akoho-maty-form (akohoMatyCreated)="onAkohoMatyCreated()"></app-akoho-maty-form>
   </div>
 
-  <div class="list-section">
-    <h3>Liste des mortalités</h3>
-    <p *ngIf="message" class="success-message">{{ message }}</p>
-    
-    <table *ngIf="akohoMatyList.length > 0">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Lot</th>
-          <th>Date de mort</th>
-          <th>Nombre de morts</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let akohoMaty of akohoMatyList">
-          <td>{{ akohoMaty.id }}</td>
-          <td>{{ akohoMaty.lot_nom }}</td>
-          <td>{{ akohoMaty.date_maty | date:'dd/MM/yyyy' }}</td>
-          <td>{{ akohoMaty.nombre }}</td>
-        </tr>
-      </tbody>
-    </table>
-    
-    <p *ngIf="akohoMatyList.length === 0" class="no-data">Aucune mortalité enregistrée.</p>
+  <!-- List card -->
+  <div class="card">
+    <h3 class="card-title"><i class="fas fa-list"></i> Historique des Mortalités</h3>
+    <div class="table-wrapper">
+      <table class="data-table" *ngIf="akohoMatyList.length > 0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Lot</th>
+            <th>Date de mort</th>
+            <th>Nombre de morts</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let akohoMaty of akohoMatyList">
+            <td class="text-muted">{{ akohoMaty.id }}</td>
+            <td>{{ akohoMaty.lot_nom }}</td>
+            <td>{{ akohoMaty.date_maty | date:'dd/MM/yyyy' }}</td>
+            <td><span class="negative">-{{ akohoMaty.nombre }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="akohoMatyList.length === 0" class="no-data">
+        <i class="fas fa-inbox"></i>
+        Aucune mortalité enregistrée.
+      </p>
+    </div>
   </div>
+
 </div>

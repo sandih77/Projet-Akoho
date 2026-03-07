@@ -1,0 +1,87 @@
+import Database from "../config/db.js";
+
+export default class ConfigurationModel {
+    static async create(configData) {
+        try {
+            const pool = await Database.getPool();
+            const request = pool.request();
+
+            request.input('lot_id', Database.getSql().Int, configData.lot_id);
+            request.input('semaine', Database.getSql().Int, configData.semaine);
+            request.input('variation_poids', Database.getSql().Decimal(10, 2), configData.variation_poids);
+            request.input('sakafo_semaine', Database.getSql().Decimal(10, 2), configData.sakafo_semaine);
+
+            const result = await request.query(`
+                INSERT INTO Configuration (lot_id, semaine, variation_poids, sakafo_semaine)
+                VALUES (@lot_id, @semaine, @variation_poids, @sakafo_semaine);
+                SELECT SCOPE_IDENTITY() AS id;
+            `);
+
+            const insertedId = result.recordset[0].id;
+            return { message: 'Configuration créée avec succès !', configuration: { id: insertedId, ...configData } };
+        } catch (err) {
+            console.error('Erreur création configuration:', err);
+            throw err;
+        }
+    }
+
+    static async getAll() {
+        try {
+            const pool = await Database.getPool();
+            const result = await pool.request().query(`
+                SELECT
+                    c.id,
+                    c.lot_id,
+                    l.name AS lot_nom,
+                    c.semaine,
+                    c.variation_poids,
+                    c.sakafo_semaine
+                FROM Configuration c
+                INNER JOIN Lot l ON c.lot_id = l.id
+                ORDER BY l.name, c.semaine
+            `);
+            return result.recordset;
+        } catch (err) {
+            console.error('Erreur récupération configurations:', err);
+            throw err;
+        }
+    }
+
+    static async getByLot(lotId) {
+        try {
+            const pool = await Database.getPool();
+            const request = pool.request();
+            request.input('lot_id', Database.getSql().Int, lotId);
+            const result = await request.query(`
+                SELECT
+                    c.id,
+                    c.lot_id,
+                    l.name AS lot_nom,
+                    c.semaine,
+                    c.variation_poids,
+                    c.sakafo_semaine
+                FROM Configuration c
+                INNER JOIN Lot l ON c.lot_id = l.id
+                WHERE c.lot_id = @lot_id
+                ORDER BY c.semaine
+            `);
+            return result.recordset;
+        } catch (err) {
+            console.error('Erreur récupération configurations par lot:', err);
+            throw err;
+        }
+    }
+
+    static async deleteById(id) {
+        try {
+            const pool = await Database.getPool();
+            const request = pool.request();
+            request.input('id', Database.getSql().Int, id);
+            await request.query('DELETE FROM Configuration WHERE id = @id');
+            return { message: 'Configuration supprimée avec succès !' };
+        } catch (err) {
+            console.error('Erreur suppression configuration:', err);
+            throw err;
+        }
+    }
+}

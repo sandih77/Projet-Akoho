@@ -1,36 +1,39 @@
 <form [formGroup]="lotsForm" (ngSubmit)="onSubmit()">
-    <div>
-        <label for="name">Nom du lot :</label>
-        <input id="name" formControlName="name" type="text" />
+    <div class="form-group">
+        <label class="form-label" for="name">Nom du lot</label>
+        <input class="form-control" id="name" formControlName="name" type="text" placeholder="ex: Lot-Alpha" />
     </div>
 
-    <div>
-        <label for="race">Race :</label>
-        <select id="race" formControlName="race_id">
+    <div class="form-group">
+        <label class="form-label" for="race">Race</label>
+        <select class="form-control" id="race" formControlName="race_id">
             <option [value]="0" disabled>Choisir une race</option>
             <option *ngFor="let race of races" [value]="race.id">{{ race.nom }}</option>
         </select>
     </div>
 
-    <div>
-        <label for="date_achat">Date d'achat :</label>
-        <input id="date_achat" formControlName="date_achat" type="date" />
+    <div class="form-group">
+        <label class="form-label" for="date_achat">Date d'achat</label>
+        <input class="form-control" id="date_achat" formControlName="date_achat" type="date" />
     </div>
 
-    <div>
-        <label for="nombre_akoho">Nombre d'akoho :</label>
-        <input id="nombre_akoho" formControlName="nombre_akoho" type="number" />
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label" for="nombre_akoho">Nombre d'akoho</label>
+            <input class="form-control" id="nombre_akoho" formControlName="nombre_akoho" type="number" min="1" />
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="age">Âge (semaines)</label>
+            <input class="form-control" id="age" formControlName="age" type="number" min="0" />
+        </div>
     </div>
 
-    <div>
-        <label for="age">Âge :</label>
-        <input id="age" formControlName="age" type="number" />
+    <div class="form-group">
+        <label class="form-label" for="prix_achat">Prix d'achat total (Ar)</label>
+        <input class="form-control" id="prix_achat" formControlName="prix_achat" type="number" min="0" />
     </div>
 
-    <div>
-        <label for="prix_achat">Prix d'achat :</label>
-        <input id="prix_achat" formControlName="prix_achat" type="number" />
-    </div>
-
-    <button type="submit">Enregistrer</button>
+    <button class="btn btn-primary" type="submit">
+        <i class="fas fa-save"></i> Enregistrer
+    </button>
 </form>

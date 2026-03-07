@@ -1,27 +1,46 @@
-<h2>Ajouter une nouvelle race</h2>
-<app-race-form (raceCreated)="onRaceCreated()"></app-race-form>
+<div class="page-header">
+  <div class="page-icon"><i class="fas fa-dove"></i></div>
+  <h2>Gestion des Races</h2>
+</div>
 
-<div *ngIf="message" class="success">{{ message }}</div>
+<div class="two-col">
 
-<h2>Liste des races</h2>
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
+  <!-- Form card -->
+  <div class="card">
+    <h3 class="card-title"><i class="fas fa-plus-circle"></i> Nouvelle Race</h3>
+    <div *ngIf="message" class="alert alert-success"><i class="fas fa-check-circle"></i> {{ message }}</div>
+    <app-race-form (raceCreated)="onRaceCreated()"></app-race-form>
+  </div>
+
+  <!-- List card -->
+  <div class="card">
+    <h3 class="card-title"><i class="fas fa-list"></i> Liste des Races</h3>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
             <th>Nom</th>
-            <th>PU Sakafo/gramme</th>
-            <th>PV/gramme</th>
+            <th>PU Sakafo / g</th>
+            <th>PV / g</th>
             <th>PU Atody</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let race of races">
-            <td>{{ race.id }}</td>
-            <td>{{ race.nom }}</td>
-            <td>{{ race.pu_sakafo_par_gramme }}</td>
-            <td>{{ race.pv_par_gramme }}</td>
-            <td>{{ race.pu_atody }}</td>
-        </tr>
-    </tbody>
-</table>
-<p *ngIf="races.length === 0" class="no-data">Aucune race enregistrée.</p>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let race of races">
+            <td class="text-muted">{{ race.id }}</td>
+            <td><strong>{{ race.nom }}</strong></td>
+            <td>{{ race.pu_sakafo_par_gramme | number:'1.3-3' }} Ar</td>
+            <td>{{ race.pv_par_gramme | number:'1.3-3' }} Ar</td>
+            <td>{{ race.pu_atody | number:'1.0-0' }} Ar</td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="races.length === 0" class="no-data">
+        <i class="fas fa-inbox"></i>
+        Aucune race enregistrée.
+      </p>
+    </div>
+  </div>
+
+</div>

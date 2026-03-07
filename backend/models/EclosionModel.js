@@ -5,22 +5,22 @@ export default class EclosionModel {
     static async create(eclosionData) {
         try {
             const pool = await Database.getPool();
-            
+
             // Vérifier que le lot existe et récupérer sa date d'achat
             const checkLotRequest = pool.request();
             checkLotRequest.input('lot_id', Database.getSql().Int, eclosionData.lot_id);
             const lotCheck = await checkLotRequest.query(
                 'SELECT date_achat, name FROM Lot WHERE id = @lot_id'
             );
-            
+
             if (lotCheck.recordset.length === 0) {
                 throw new Error('Lot non trouvé');
             }
-            
+
             const dateAchat = new Date(lotCheck.recordset[0].date_achat);
             const dateEclosion = new Date(eclosionData.date_eclosion);
             const lotName = lotCheck.recordset[0].name;
-            
+
             // Vérifier que la date d'éclosion n'est pas antérieure à la date d'achat
             if (dateEclosion < dateAchat) {
                 throw new Error(
@@ -30,7 +30,7 @@ export default class EclosionModel {
                     `Le lot n'existait pas encore à cette date.`
                 );
             }
-            
+
             const request = pool.request();
             request.input('lot_id', Database.getSql().Int, eclosionData.lot_id);
             request.input('date_eclosion', Database.getSql().Date, eclosionData.date_eclosion);
@@ -38,7 +38,7 @@ export default class EclosionModel {
 
             // Vérifier le nombre total d'atody disponibles pour ce lot à cette date
             const totalAtody = await AtodyModel.getTotalByLotAndDate(
-                eclosionData.lot_id, 
+                eclosionData.lot_id,
                 eclosionData.date_eclosion
             );
 
@@ -67,7 +67,7 @@ export default class EclosionModel {
 
             // Créer le nouvel lot à partir de l'éclosion
             const nouveauLotNom = `Eclosion-${lot_mere_name}-${new Date(eclosionData.date_eclosion).toISOString().split('T')[0]}`;
-            
+
             const createLotRequest = pool.request();
             createLotRequest.input('name', Database.getSql().VarChar, nouveauLotNom);
             createLotRequest.input('race_id', Database.getSql().Int, race_id);
@@ -103,8 +103,8 @@ export default class EclosionModel {
             );
 
             const insertedId = result.recordset[0].id;
-            return { 
-                message: `Eclosion créée avec succès ! Nouveau lot "${nouveauLotNom}" (${race_nom}) créé avec ${eclosionData.nombre_foy} akoho(s). ${eclosionData.nombre_foy} atody déduits du stock.`, 
+            return {
+                message: `Eclosion créée avec succès ! Nouveau lot "${nouveauLotNom}" (${race_nom}) créé avec ${eclosionData.nombre_foy} akoho(s). ${eclosionData.nombre_foy} atody déduits du stock.`,
                 eclosion: { id: insertedId, ...eclosionData },
                 nouveau_lot: {
                     id: nouveauLotId,

@@ -1,43 +1,54 @@
-<div class="atody-manager">
-  <h2>Gestion de la Production d'Œufs (Atody)</h2>
-  
-  <div class="form-section">
-    <h3>Ajouter une production</h3>
+<div class="page-header">
+  <div class="page-icon"><i class="fas fa-egg"></i></div>
+  <h2>Production d'Œufs (Atody)</h2>
+</div>
+
+<div class="two-col">
+
+  <!-- Form card -->
+  <div class="card">
+    <h3 class="card-title"><i class="fas fa-plus-circle"></i> Nouvelle Production</h3>
+    <div *ngIf="message" class="alert alert-success"><i class="fas fa-check-circle"></i> {{ message }}</div>
     <app-atody-form (atodyCreated)="onAtodyCreated()"></app-atody-form>
   </div>
 
-  <div class="list-section">
-    <h3>Liste des productions</h3>
-    <p *ngIf="message" class="success-message">{{ message }}</p>
-    
-    <table *ngIf="atodyList.length > 0">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Lot</th>
-          <th>Date</th>
-          <th>Type</th>
-          <th>Nombre d'œufs</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let atody of atodyList" [class.eclosion]="atody.nombre_atody < 0">
-          <td>{{ atody.id }}</td>
-          <td>{{ atody.lot_nom }}</td>
-          <td>{{ atody.date_production | date:'dd/MM/yyyy' }}</td>
-          <td>
-            <span [class.badge-production]="atody.nombre_atody > 0" 
-                  [class.badge-eclosion]="atody.nombre_atody < 0">
-              {{ atody.nombre_atody > 0 ? 'Production' : 'Éclosion' }}
-            </span>
-          </td>
-          <td [class.positive]="atody.nombre_atody > 0" [class.negative]="atody.nombre_atody < 0">
-            {{ atody.nombre_atody > 0 ? '+' : '' }}{{ atody.nombre_atody }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    
-    <p *ngIf="atodyList.length === 0" class="no-data">Aucune production enregistrée.</p>
+  <!-- List card -->
+  <div class="card">
+    <h3 class="card-title"><i class="fas fa-list"></i> Historique des Productions</h3>
+    <div class="table-wrapper">
+      <table class="data-table" *ngIf="atodyList.length > 0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Lot</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Nb œufs</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let atody of atodyList" [class.row-eclosion]="atody.nombre_atody < 0">
+            <td class="text-muted">{{ atody.id }}</td>
+            <td>{{ atody.lot_nom }}</td>
+            <td>{{ atody.date_production | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <span class="badge"
+                    [class.badge-production]="atody.nombre_atody > 0"
+                    [class.badge-eclosion]="atody.nombre_atody < 0">
+                {{ atody.nombre_atody > 0 ? 'Production' : 'Éclosion' }}
+              </span>
+            </td>
+            <td [class.positive]="atody.nombre_atody > 0" [class.negative]="atody.nombre_atody < 0">
+              {{ atody.nombre_atody > 0 ? '+' : '' }}{{ atody.nombre_atody }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="atodyList.length === 0" class="no-data">
+        <i class="fas fa-inbox"></i>
+        Aucune production enregistrée.
+      </p>
+    </div>
   </div>
+
 </div>

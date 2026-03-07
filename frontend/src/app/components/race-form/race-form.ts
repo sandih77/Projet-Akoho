@@ -27,8 +27,8 @@ export class RaceForm {
       this.raceService.createRace(this.raceForm.value).subscribe({
         next: (res) => {
           console.log('Race créée:', res);
-          this.raceForm.reset(); 
-          this.raceCreated.emit(); 
+          this.raceForm.reset();
+          this.raceCreated.emit();
         },
         error: (err) => {
           console.error('Erreur lors de la création:', err);

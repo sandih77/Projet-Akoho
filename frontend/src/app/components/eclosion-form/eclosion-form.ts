@@ -45,7 +45,7 @@ export class EclosionForm implements OnInit {
     if (this.eclosionForm.valid) {
       this.errorMessage = '';
       this.successMessage = '';
-      
+
       this.eclosionService.create(this.eclosionForm.value as Eclosion).subscribe({
         next: (res: any) => {
           console.log('Eclosion créée:', res);
@@ -57,7 +57,7 @@ export class EclosionForm implements OnInit {
             nombre_tsy_foy: 0
           });
           this.eclosionCreated.emit();
-          
+
           // Effacer le message de succès après 3 secondes
           setTimeout(() => {
             this.successMessage = '';
@@ -65,7 +65,7 @@ export class EclosionForm implements OnInit {
         },
         error: (err: any) => {
           console.error('Erreur création eclosion:', err);
-          
+
           // Extraire le message d'erreur du backend
           if (err.error) {
             if (typeof err.error === 'string') {

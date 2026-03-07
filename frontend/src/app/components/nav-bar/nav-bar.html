@@ -1,15 +1,69 @@
-<nav>
-  <a [routerLink]="['race-manager']">Gestion des races</a>
-  <br>
-  <a [routerLink]="['lots-manager']">Gestion des lots</a>
-  <br>
-  <a [routerLink]="['atody-manager']">Production d'œufs (Atody)</a>
-  <br>
-  <a [routerLink]="['akoho-maty-manager']">Mortalité (Akoho Maty)</a>
-  <br>
-  <a [routerLink]="['eclosion-manager']">Éclosions</a>
-  <br>
-  <a [routerLink]="['bilan']">Voir bilan à une date</a>
-</nav>
-<br>
-<router-outlet />
+<div class="app-shell">
+
+  <!-- ====== SIDEBAR ====================================== -->
+  <aside class="sidebar" [class.open]="menuOpen">
+
+    <div class="sidebar-brand">
+      <div>
+        <div class="brand-name">Akoho</div>
+        <div class="brand-sub">Ferme Avicole</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-link" routerLink="race-manager" routerLinkActive="active" (click)="menuOpen = false">
+        <i class="fas fa-dove nav-icon"></i>
+        <span>Races</span>
+      </a>
+      <a class="nav-link" routerLink="lots-manager" routerLinkActive="active" (click)="menuOpen = false">
+        <i class="fas fa-box-open nav-icon"></i>
+        <span>Lots</span>
+      </a>
+      <a class="nav-link" routerLink="configuration-manager" routerLinkActive="active" (click)="menuOpen = false">
+        <i class="fas fa-sliders-h nav-icon"></i>
+        <span>Configurations</span>
+      </a>
+      <a class="nav-link" routerLink="atody-manager" routerLinkActive="active" (click)="menuOpen = false">
+        <i class="fas fa-egg nav-icon"></i>
+        <span>Production d'œufs</span>
+      </a>
+      <a class="nav-link" routerLink="akoho-maty-manager" routerLinkActive="active" (click)="menuOpen = false">
+        <i class="fas fa-skull-crossbones nav-icon"></i>
+        <span>Mortalité</span>
+      </a>
+      <a class="nav-link" routerLink="eclosion-manager" routerLinkActive="active" (click)="menuOpen = false">
+        <i class="fas fa-seedling nav-icon"></i>
+        <span>Éclosions</span>
+      </a>
+      <a class="nav-link" routerLink="bilan" routerLinkActive="active" (click)="menuOpen = false">
+        <i class="fas fa-chart-pie nav-icon"></i>
+        <span>Bilan</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="sidebar-footer-text">🌿 Sandih ETU004174 !</span>
+    </div>
+
+  </aside>
+
+  <!-- ====== MOBILE OVERLAY ================================ -->
+  <div class="sidebar-overlay" *ngIf="menuOpen" (click)="menuOpen = false"></div>
+
+  <!-- ====== CONTENT AREA ================================== -->
+  <div class="content-area">
+
+    <header class="top-bar">
+      <button class="menu-toggle" (click)="menuOpen = !menuOpen" aria-label="Menu">
+        <i class="fas" [class.fa-bars]="!menuOpen" [class.fa-times]="menuOpen"></i>
+      </button>
+      <span class="top-bar-title">Gestion de Ferme Avicole</span>
+    </header>
+
+    <main class="main-content">
+      <router-outlet />
+    </main>
+
+  </div>
+
+</div>

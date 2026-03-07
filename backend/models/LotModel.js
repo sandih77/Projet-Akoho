@@ -55,9 +55,9 @@ export default class LotModel {
         try {
             const pool = await Database.getPool();
             const request = pool.request();
-            
+
             request.input('lot_id', Database.getSql().Int, lotId);
-            
+
             const result = await request.query(`
                 SELECT 
                     L.id AS lot_id,
@@ -74,7 +74,7 @@ export default class LotModel {
                 INNER JOIN Race R ON L.race_id = R.id
                 WHERE L.id = @lot_id
             `);
-            
+
             return result.recordset[0] || null;
         } catch (err) {
             console.error('Erreur récupération lot avec race info:', err);
@@ -86,16 +86,16 @@ export default class LotModel {
         try {
             const pool = await Database.getPool();
             const request = pool.request();
-            
+
             request.input('lot_id', Database.getSql().Int, lotId);
-            
+
             const result = await request.query(`
                 SELECT semaine, variation_poids, sakafo_semaine
                 FROM Configuration
                 WHERE lot_id = @lot_id
                 ORDER BY semaine ASC
             `);
-            
+
             return result.recordset;
         } catch (err) {
             console.error('Erreur récupération configurations:', err);

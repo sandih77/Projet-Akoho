@@ -44,7 +44,7 @@ export class AtodyForm implements OnInit {
     if (this.atodyForm.valid) {
       this.errorMessage = '';
       this.successMessage = '';
-      
+
       this.atodyService.create(this.atodyForm.value as Atody).subscribe({
         next: (res: any) => {
           console.log('Atody créé:', res);
@@ -55,7 +55,7 @@ export class AtodyForm implements OnInit {
             nombre_atody: 0
           });
           this.atodyCreated.emit();
-          
+
           // Effacer le message de succès après 3 secondes
           setTimeout(() => {
             this.successMessage = '';
@@ -63,7 +63,7 @@ export class AtodyForm implements OnInit {
         },
         error: (err: any) => {
           console.error('Erreur création atody:', err);
-          
+
           // Extraire le message d'erreur du backend
           if (err.error) {
             if (typeof err.error === 'string') {

@@ -4,22 +4,22 @@ export default class AtodyModel {
     static async create(atodyData) {
         try {
             const pool = await Database.getPool();
-            
+
             // Vérifier que le lot existe et récupérer sa date d'achat
             const checkLotRequest = pool.request();
             checkLotRequest.input('lot_id', Database.getSql().Int, atodyData.lot_id);
             const lotResult = await checkLotRequest.query(
                 'SELECT date_achat, name FROM Lot WHERE id = @lot_id'
             );
-            
+
             if (lotResult.recordset.length === 0) {
                 throw new Error('Lot non trouvé');
             }
-            
+
             const dateAchat = new Date(lotResult.recordset[0].date_achat);
             const dateProduction = new Date(atodyData.date_production);
             const lotName = lotResult.recordset[0].name;
-            
+
             // Vérifier que la date de production n'est pas antérieure à la date d'achat
             if (dateProduction < dateAchat) {
                 throw new Error(
@@ -29,7 +29,7 @@ export default class AtodyModel {
                     `Le lot n'existait pas encore à cette date.`
                 );
             }
-            
+
             const request = pool.request();
             request.input('lot_id', Database.getSql().Int, atodyData.lot_id);
             request.input('date_production', Database.getSql().Date, atodyData.date_production);
@@ -74,16 +74,16 @@ export default class AtodyModel {
         try {
             const pool = await Database.getPool();
             const request = pool.request();
-            
+
             request.input('lot_id', Database.getSql().Int, lotId);
             request.input('date_bilan', Database.getSql().Date, dateBilan);
-            
+
             const result = await request.query(`
                 SELECT ISNULL(SUM(nombre_atody), 0) AS total_atody
                 FROM Atody 
                 WHERE lot_id = @lot_id AND date_production <= @date_bilan
             `);
-            
+
             return result.recordset[0]?.total_atody || 0;
         } catch (err) {
             console.error('Erreur récupération total atody:', err);

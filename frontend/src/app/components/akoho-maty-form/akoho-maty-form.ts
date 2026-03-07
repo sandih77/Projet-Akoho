@@ -44,7 +44,7 @@ export class AkohoMatyForm implements OnInit {
     if (this.akohoMatyForm.valid) {
       this.errorMessage = '';
       this.successMessage = '';
-      
+
       this.akohoMatyService.create(this.akohoMatyForm.value as AkohoMaty).subscribe({
         next: (res: any) => {
           console.log('Akoho Maty créé:', res);
@@ -55,7 +55,7 @@ export class AkohoMatyForm implements OnInit {
             nombre: 0
           });
           this.akohoMatyCreated.emit();
-          
+
           // Effacer le message de succès après 3 secondes
           setTimeout(() => {
             this.successMessage = '';
@@ -63,7 +63,7 @@ export class AkohoMatyForm implements OnInit {
         },
         error: (err: any) => {
           console.error('Erreur création akoho maty:', err);
-          
+
           // Extraire le message d'erreur du backend
           if (err.error) {
             if (typeof err.error === 'string') {

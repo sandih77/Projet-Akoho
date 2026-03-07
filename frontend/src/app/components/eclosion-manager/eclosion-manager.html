@@ -1,34 +1,44 @@
-<div class="eclosion-manager">
+<div class="page-header">
+  <div class="page-icon"><i class="fas fa-seedling"></i></div>
   <h2>Gestion des Éclosions</h2>
+</div>
 
-  <div class="form-section">
-    <h3>Ajouter une éclosion</h3>
+<div class="two-col">
+
+  <!-- Form card -->
+  <div class="card">
+    <h3 class="card-title"><i class="fas fa-plus-circle"></i> Nouvelle Éclosion</h3>
+    <div *ngIf="message" class="alert alert-success"><i class="fas fa-check-circle"></i> {{ message }}</div>
     <app-eclosion-form (eclosionCreated)="onEclosionCreated()"></app-eclosion-form>
   </div>
 
-  <div class="list-section">
-    <h3>Liste des éclosions</h3>
-    <p *ngIf="message" class="success-message">{{ message }}</p>
-
-    <table *ngIf="eclosionList.length > 0">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Lot</th>
-          <th>Date d'éclosion</th>
-          <th>Nombre éclos</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let eclosion of eclosionList">
-          <td>{{ eclosion.id }}</td>
-          <td>{{ eclosion.lot_nom }}</td>
-          <td>{{ eclosion.date_eclosion | date:'dd/MM/yyyy' }}</td>
-          <td>{{ eclosion.nombre_foy }}</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p *ngIf="eclosionList.length === 0" class="no-data">Aucune éclosion enregistrée.</p>
+  <!-- List card -->
+  <div class="card">
+    <h3 class="card-title"><i class="fas fa-list"></i> Historique des Éclosions</h3>
+    <div class="table-wrapper">
+      <table class="data-table" *ngIf="eclosionList.length > 0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Lot mère</th>
+            <th>Date d'éclosion</th>
+            <th>Poussins éclos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let eclosion of eclosionList">
+            <td class="text-muted">{{ eclosion.id }}</td>
+            <td>{{ eclosion.lot_nom }}</td>
+            <td>{{ eclosion.date_eclosion | date:'dd/MM/yyyy' }}</td>
+            <td><span class="badge badge-warning">{{ eclosion.nombre_foy }} poussins</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="eclosionList.length === 0" class="no-data">
+        <i class="fas fa-inbox"></i>
+        Aucune éclosion enregistrée.
+      </p>
+    </div>
   </div>
+
 </div>

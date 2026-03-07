@@ -1,0 +1,38 @@
+<div *ngIf="errorMessage" class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> {{ errorMessage }}</div>
+<div *ngIf="successMessage" class="alert alert-success"><i class="fas fa-check-circle"></i> {{ successMessage }}</div>
+
+<form [formGroup]="configForm" (ngSubmit)="onSubmit()">
+
+    <div class="form-group">
+        <label class="form-label" for="lot_id">Lot</label>
+        <select class="form-control" id="lot_id" formControlName="lot_id">
+            <option [value]="0" disabled>Choisir un lot</option>
+            <option *ngFor="let lot of lots" [value]="lot.id">{{ lot.name }} ({{ lot.race_nom }})</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label" for="semaine">Numéro de semaine</label>
+        <input class="form-control" id="semaine" type="number" min="0" formControlName="semaine"
+            placeholder="0 = 1re semaine après achat" />
+        <span class="form-hint">Semaine 0 commence à la date d'achat</span>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label" for="variation_poids">Variation de poids (g)</label>
+            <input class="form-control" id="variation_poids" type="number" min="0" step="0.01"
+                formControlName="variation_poids" placeholder="ex : 80" />
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="sakafo_semaine">Sakafo / semaine (g)</label>
+            <input class="form-control" id="sakafo_semaine" type="number" min="0" step="0.01"
+                formControlName="sakafo_semaine" placeholder="ex : 2500" />
+        </div>
+    </div>
+
+    <button class="btn btn-primary" type="submit">
+        <i class="fas fa-save"></i> Enregistrer
+    </button>
+
+</form>

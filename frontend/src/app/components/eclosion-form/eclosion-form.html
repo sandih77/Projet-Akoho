@@ -1,29 +1,26 @@
-<div *ngIf="errorMessage" class="error-message">
-    {{ errorMessage }}
-</div>
-
-<div *ngIf="successMessage" class="success-message">
-    {{ successMessage }}
-</div>
+<div *ngIf="errorMessage" class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> {{ errorMessage }}</div>
+<div *ngIf="successMessage" class="alert alert-success"><i class="fas fa-check-circle"></i> {{ successMessage }}</div>
 
 <form [formGroup]="eclosionForm" (ngSubmit)="onSubmit()">
-    <div>
-        <label for="lot">Lot :</label>
-        <select id="lot" formControlName="lot_id">
+    <div class="form-group">
+        <label class="form-label" for="lot">Lot mère</label>
+        <select class="form-control" id="lot" formControlName="lot_id">
             <option [value]="0" disabled>Choisir un lot</option>
             <option *ngFor="let lot of lots" [value]="lot.id">{{ lot.name }} ({{ lot.race_nom }})</option>
         </select>
     </div>
 
-    <div>
-        <label for="date_eclosion">Date d'éclosion :</label>
-        <input id="date_eclosion" formControlName="date_eclosion" type="date" />
+    <div class="form-group">
+        <label class="form-label" for="date_eclosion">Date d'éclosion</label>
+        <input class="form-control" id="date_eclosion" formControlName="date_eclosion" type="date" />
     </div>
 
-    <div>
-        <label for="nombre_foy">Nombre éclos :</label>
-        <input id="nombre_foy" formControlName="nombre_foy" type="number" />
+    <div class="form-group">
+        <label class="form-label" for="nombre_foy">Nombre de poussins éclos</label>
+        <input class="form-control" id="nombre_foy" formControlName="nombre_foy" type="number" min="1" />
     </div>
 
-    <button type="submit">Enregistrer</button>
+    <button class="btn btn-primary" type="submit">
+        <i class="fas fa-save"></i> Enregistrer
+    </button>
 </form>

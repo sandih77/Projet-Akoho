@@ -6,6 +6,7 @@ import AtodyRoutes from "./routes/AtodyRoutes.js";
 import AkohoMatyRoutes from "./routes/AkohoMatyRoutes.js";
 import EclosionRoutes from "./routes/EclosionRoutes.js";
 import BilanRoutes from "./routes/BilanRoutes.js";
+import ConfigurationRoutes from "./routes/ConfigurationRoutes.js";
 import Database from "./config/db.js";
 
 const app = express();
@@ -31,6 +32,9 @@ app.use("/api/eclosion", eclosionRoutes.getRouter());
 
 const bilanRoutes = new BilanRoutes();
 app.use("/api/bilan", bilanRoutes.getRouter());
+
+const configurationRoutes = new ConfigurationRoutes();
+app.use("/api/configuration", configurationRoutes.getRouter());
 
 // Connexion à la base de données au démarrage
 Database.connect()

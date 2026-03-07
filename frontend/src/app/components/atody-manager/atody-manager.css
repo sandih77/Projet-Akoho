@@ -1,32 +1,6 @@
-/* Styles pour atody-manager */
+/* row highlight for eclosion deduction rows */
+.row-eclosion { background: #fff8f0; }
 
-.atody-manager {
-    padding: 20px;
-}
-
-.form-section,
-.list-section {
-    margin-bottom: 30px;
-}
-
-.success-message {
-    background-color: #d4edda;
-    color: #155724;
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 15px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-thead {
-    background-color: #f8f9fa;
-}
 
 th, td {
     padding: 12px;

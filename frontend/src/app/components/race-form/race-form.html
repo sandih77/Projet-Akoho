@@ -1,15 +1,28 @@
 <form [formGroup]="raceForm" (ngSubmit)="onSubmit()">
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" formControlName="nom" />
-    
-    <label for="prix-sakafo">Prix sakafo par gramme :</label>
-    <input type="number" id="prix-sakafo" name="prix-sakafo" step="0.01" formControlName="pu_sakafo_par_gramme" />
+  <div class="form-group">
+    <label class="form-label" for="nom">Nom de la race</label>
+    <input class="form-control" type="text" id="nom" formControlName="nom" placeholder="ex: Pondeuse Rouge" />
+  </div>
 
-    <label for="prix-vente">Prix de vente par gramme :</label>
-    <input type="number" id="prix-vente" name="prix-vente" step="0.01" formControlName="pv_par_gramme" />
+  <div class="form-group">
+    <label class="form-label" for="prix-sakafo">PU Sakafo / gramme (Ar)</label>
+    <input class="form-control" type="number" id="prix-sakafo" step="0.001" formControlName="pu_sakafo_par_gramme"
+      placeholder="0.05" />
+  </div>
 
-    <label for="prix-atody">Prix unitaire oeuf :</label>
-    <input type="number" id="prix-atody" name="prix-atody" step="0.01" formControlName="pu_atody" />
-    
-    <button type="submit">Submit</button>
+  <div class="form-group">
+    <label class="form-label" for="prix-vente">Prix de vente / gramme (Ar)</label>
+    <input class="form-control" type="number" id="prix-vente" step="0.001" formControlName="pv_par_gramme"
+      placeholder="0.10" />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="prix-atody">Prix unitaire oeuf (Ar)</label>
+    <input class="form-control" type="number" id="prix-atody" step="0.01" formControlName="pu_atody"
+      placeholder="500" />
+  </div>
+
+  <button class="btn btn-primary" type="submit">
+    <i class="fas fa-save"></i> Enregistrer
+  </button>
 </form>

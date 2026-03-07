@@ -36,11 +36,11 @@ export default class BilanModel {
         for (const config of configurations) {
             if (config.semaine < semaines) {
                 // Semaine complète
-                total_sakafo    += config.sakafo_semaine   || 0;
-                total_variation += config.variation_poids  || 0;
+                total_sakafo += config.sakafo_semaine || 0;
+                total_variation += config.variation_poids || 0;
             } else if (config.semaine === semaines && jours > 0) {
                 // Semaine partielle : pro-rata (jours / 7)
-                total_sakafo    += (config.sakafo_semaine  || 0) * (jours / 7);
+                total_sakafo += (config.sakafo_semaine || 0) * (jours / 7);
                 total_variation += (config.variation_poids || 0) * (jours / 7);
             }
         }
@@ -65,21 +65,21 @@ export default class BilanModel {
         const coutTotalAtody = totalAtody * lotInfo.pu_atody;
 
         // Calculs financiers
-        const revenustotaux  = pvTotalAkoho + coutTotalAtody;
+        const revenustotaux = pvTotalAkoho + coutTotalAtody;
         const depensesTotales = lotInfo.cout_achat + sakafoCout;
-        const benefices       = revenustotaux - depensesTotales;
+        const benefices = revenustotaux - depensesTotales;
 
         return {
             nombre_akoho_vivants: nombreAkohoVivants,
-            sakafo_poids:         sakafoResult.total_sakafo,
-            sakafo_cout:          sakafoCout,
-            poids_moyen:          poidsMoyen,
-            pv_total_akoho:       pvTotalAkoho,
-            nombre_atody:         totalAtody,
-            cout_total_atody:     coutTotalAtody,
-            revenus_totaux:       revenustotaux,
-            depenses_totales:     depensesTotales,
-            benefices:            benefices
+            sakafo_poids: sakafoResult.total_sakafo,
+            sakafo_cout: sakafoCout,
+            poids_moyen: poidsMoyen,
+            pv_total_akoho: pvTotalAkoho,
+            nombre_atody: totalAtody,
+            cout_total_atody: coutTotalAtody,
+            revenus_totaux: revenustotaux,
+            depenses_totales: depensesTotales,
+            benefices: benefices
         };
     }
 
@@ -91,11 +91,11 @@ export default class BilanModel {
             if (!lotInfo) {
                 return null;
             }
-            
+
             // Vérifier que la date du bilan n'est pas antérieure à la date d'achat
             const dateAchat = new Date(lotInfo.date_achat);
             const dateBilanDate = new Date(dateBilan);
-            
+
             if (dateBilanDate < dateAchat) {
                 throw new Error(
                     `Impossible: la date du bilan (${dateBilanDate.toLocaleDateString('fr-FR')}) ` +
@@ -129,17 +129,17 @@ export default class BilanModel {
 
             // 8. Construire le bilan complet
             return {
-                lot_id:               lotInfo.lot_id,
-                lot_name:             lotInfo.lot_name,
-                race_nom:             lotInfo.race_nom,
+                lot_id: lotInfo.lot_id,
+                lot_name: lotInfo.lot_name,
+                race_nom: lotInfo.race_nom,
                 nombre_initial_akoho: lotInfo.nombre_initial_akoho,
-                cout_achat:           lotInfo.cout_achat,
-                age_initial:          lotInfo.age_initial,
-                date_achat:           lotInfo.date_achat,
-                semaines_ecoulees:    duree.semaines,
-                jours_ecoules:        duree.jours,
-                total_jours:          duree.totalJours,
-                nombre_akoho_maty:    totalAkohoMaty,
+                cout_achat: lotInfo.cout_achat,
+                age_initial: lotInfo.age_initial,
+                date_achat: lotInfo.date_achat,
+                semaines_ecoulees: duree.semaines,
+                jours_ecoules: duree.jours,
+                total_jours: duree.totalJours,
+                nombre_akoho_maty: totalAkohoMaty,
                 ...finances
             };
         } catch (err) {
