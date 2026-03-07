@@ -1,28 +1,53 @@
 import Database from "../config/db.js";
 
-const db = Database.getSql();
+export default class LotModel {
+    static async create(lotData) {
+        try {
+            const pool = await Database.getPool();
+            const request = pool.request();
 
-class LotModel {
-    constructor(name, race_id, date_achat, nombre_akoho, age, prix_achat) {
-        this.name = name;
-        this.race_id = race_id;
-        this.date_achat = date_achat;
-        this.nombre_akoho = nombre_akoho;
-        this.age = age;
-        this.prix_achat = prix_achat;
+            request.input('name', Database.getSql().VarChar, lotData.name);
+            request.input('race_id', Database.getSql().Int, lotData.race_id);
+            request.input('date_achat', Database.getSql().Date, lotData.date_achat);
+            request.input('nombre_akoho', Database.getSql().Int, lotData.nombre_akoho);
+            request.input('age', Database.getSql().Int, lotData.age);
+            request.input('prix_achat', Database.getSql().Decimal(10, 2), lotData.prix_achat);
+
+            const result = await request.query(
+                `INSERT INTO Lot (name, race_id, date_achat, nombre_akoho, age, prix_achat)
+                 VALUES (@name, @race_id, @date_achat, @nombre_akoho, @age, @prix_achat);
+                 SELECT SCOPE_IDENTITY() AS id;`
+            );
+
+            const insertedId = result.recordset[0].id;
+            return { message: 'Lot créé avec succès !', lot: { id: insertedId, ...lotData } };
+        } catch (err) {
+            console.error('Erreur création lot:', err);
+            throw err;
+        }
     }
 
-    static create(lot, result) {
-        const sql = "INSERT INTO Lot (name, race_id, date_achat, nombre_akoho, age, prix_achat) VALUES (?, ?, ?, ?, ?, ?)";
-        db.query(sql, [lot.name, lot.race_id, lot.date_achat, lot.nombre_akoho, lot.age, lot.prix_achat], (err, res) => {
-            if (err) {
-                console.error("Error creating lot: ", err);
-                result(err, null);
-                return;
-            }
-            console.log("Created lot: ", { id: res.insertId, ...lot });
-            result(null, { id: res.insertId, ...lot });
-        });
+    static async getAll() {
+        try {
+            const pool = await Database.getPool();
+            const result = await pool.request().query(`
+                SELECT 
+                    Lot.id, 
+                    Lot.name, 
+                    Lot.race_id, 
+                    Race.nom as race_nom,
+                    Lot.date_achat, 
+                    Lot.nombre_akoho, 
+                    Lot.age, 
+                    Lot.prix_achat
+                FROM Lot
+                INNER JOIN Race ON Lot.race_id = Race.id
+                ORDER BY Lot.id
+            `);
+            return result.recordset;
+        } catch (err) {
+            console.error('Erreur récupération lots:', err);
+            throw err;
+        }
     }
 }
-export default LotModel;

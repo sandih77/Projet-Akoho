@@ -4,8 +4,7 @@
 <div *ngIf="message" class="success">{{ message }}</div>
 
 <h2>Liste des races</h2>
-<div *ngIf="loading">Chargement...</div>
-<table *ngIf="!loading">
+<table>
     <thead>
         <tr>
             <th>ID</th>
@@ -25,3 +24,4 @@
         </tr>
     </tbody>
 </table>
+<p *ngIf="races.length === 0" class="no-data">Aucune race enregistrée.</p>

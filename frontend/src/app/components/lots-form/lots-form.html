@@ -1,15 +1,36 @@
 <form [formGroup]="lotsForm" (ngSubmit)="onSubmit()">
-    <label for="date-achat">Date achat:</label>
-    <input type="date" id="date-achat" formControlName="date-achat" />
+    <div>
+        <label for="name">Nom du lot :</label>
+        <input id="name" formControlName="name" type="text" />
+    </div>
 
-    <label for="nbr-akoho">Nombre akoho :</label>
-    <input type="number" id="nbr-akoho" formControlName="nbr-akoho" step="0.01" />
+    <div>
+        <label for="race">Race :</label>
+        <select id="race" formControlName="race_id">
+            <option [value]="0" disabled>Choisir une race</option>
+            <option *ngFor="let race of races" [value]="race.id">{{ race.nom }}</option>
+        </select>
+    </div>
 
-    <label for="age">Age (semaine):</label>
-    <input type="number" id="age" formControlName="age" />
+    <div>
+        <label for="date_achat">Date d'achat :</label>
+        <input id="date_achat" formControlName="date_achat" type="date" />
+    </div>
 
-    <label for="prix-achat">Prix achat :</label>
-    <input type="number" id="prix-achat" formControlName="prix-achat" step="0.01" />
+    <div>
+        <label for="nombre_akoho">Nombre d'akoho :</label>
+        <input id="nombre_akoho" formControlName="nombre_akoho" type="number" />
+    </div>
 
-    <button type="submit">Submit</button>
+    <div>
+        <label for="age">Âge :</label>
+        <input id="age" formControlName="age" type="number" />
+    </div>
+
+    <div>
+        <label for="prix_achat">Prix d'achat :</label>
+        <input id="prix_achat" formControlName="prix_achat" type="number" />
+    </div>
+
+    <button type="submit">Enregistrer</button>
 </form>

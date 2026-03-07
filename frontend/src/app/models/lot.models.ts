@@ -2,6 +2,7 @@ export class Lots {
     id?: number;
     name: string;
     race_id: number;
+    race_nom?: string;
     date_achat: Date;
     nombre_akoho: number;
     age: number;

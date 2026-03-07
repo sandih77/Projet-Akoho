@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Race } from '../../models/race.model';
 import { RaceService } from '../../services/race.services';
 import { CommonModule } from '@angular/common';
@@ -10,9 +10,8 @@ import { RaceForm } from '../race-form/race-form';
   templateUrl: './races-manager.html',
   styleUrl: './races-manager.css',
 })
-export class RacesManager {
+export class RacesManager implements OnInit {
   races: Race[] = [];
-  loading = true;
   message = '';
 
   constructor(private raceService: RaceService) { }
@@ -22,21 +21,23 @@ export class RacesManager {
   }
 
   loadRaces(): void {
-    this.loading = true;
     this.raceService.getAllRaces().subscribe({
       next: (data) => {
         this.races = data;
-        this.loading = false;
       },
       error: (err) => {
         console.error('Erreur récupération races:', err);
-        this.loading = false;
       }
     });
   }
 
   onRaceCreated(): void {
     this.message = 'Race créée avec succès !';
-    this.loadRaces(); // rafraîchir la liste après création
+    // Recharger la liste pour avoir les IDs corrects
+    this.loadRaces();
+    // Effacer le message après 3 secondes
+    setTimeout(() => {
+      this.message = '';
+    }, 3000);
   }
 }

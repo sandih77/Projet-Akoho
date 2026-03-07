@@ -9,6 +9,7 @@ export default class LotRoutes {
 
   initRoutes() {
     this.router.post("/create-lot", LotController.create);
+    this.router.get("/list-lots", LotController.getAll);
   }
 
   getRouter() {

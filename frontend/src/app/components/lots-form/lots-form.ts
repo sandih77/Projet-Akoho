@@ -1,29 +1,64 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { RaceService } from '../../services/race.services';
+import { LotsServices } from '../../services/lots-services';
+import { Race } from '../../models/race.model';
+import { Lots } from '../../models/lot.models';
 
 @Component({
   selector: 'app-lots-form',
-  imports: [ReactiveFormsModule],
   templateUrl: './lots-form.html',
-  styleUrls: ['./lots-form.css']
+  styleUrls: ['./lots-form.css'],
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule]
 })
-export class LotsForm {
+export class LotsForm implements OnInit {
+  races: Race[] = [];
   lotsForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
-    // Initialisation du formulaire avec des champs et validation simple
+  @Output() lotCreated = new EventEmitter<void>();
+
+  constructor(
+    private fb: FormBuilder,
+    private raceService: RaceService,
+    private lotService: LotsServices // ← correspond à ton service
+  ) {
     this.lotsForm = this.fb.group({
-      'date-achat': ['', Validators.required],
-      'nbr-akoho': [0, Validators.required],
-      'age': [0, Validators.required],
-      'prix-achat': [0, Validators.required]
+      name: ['', Validators.required],
+      race_id: [0, Validators.required],
+      date_achat: ['', Validators.required],
+      nombre_akoho: [0, Validators.required],
+      age: [0, Validators.required],
+      prix_achat: [0, Validators.required]
     });
   }
 
-  onSubmit() {
+  ngOnInit(): void {
+    this.raceService.getAllRaces().subscribe({
+      next: (data: Race[]) => this.races = data,
+      error: (err: any) => console.error('Erreur récupération races', err)
+    });
+  }
+
+  onSubmit(): void {
     if (this.lotsForm.valid) {
       console.log('Données du formulaire:', this.lotsForm.value);
-      // Ici, tu peux appeler ton API Node.js pour envoyer les données
+      this.lotService.create(this.lotsForm.value as Lots).subscribe({
+        next: (res: any) => {
+          console.log('Lot créé:', res);
+          this.lotsForm.reset({
+            name: '',
+            race_id: 0,
+            date_achat: '',
+            nombre_akoho: 0,
+            age: 0,
+            prix_achat: 0
+          });
+          this.lotCreated.emit(); // Émettre l'événement
+        },
+        error: (err: any) => console.error('Erreur création lot:', err)
+      });
     } else {
       console.log('Formulaire invalide !');
     }
