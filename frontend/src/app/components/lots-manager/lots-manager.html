@@ -1,40 +1,40 @@
 <div class="lots-manager">
-  <h2>Gestion des Lots</h2>
-  
-  <div class="form-section">
-    <h3>Ajouter un nouveau lot</h3>
-    <app-lots-form (lotCreated)="onLotCreated()"></app-lots-form>
-  </div>
+    <h2>Gestion des Lots</h2>
 
-  <div class="list-section">
-    <h3>Liste des lots</h3>
-    <p *ngIf="message" class="success-message">{{ message }}</p>
-    
-    <table *ngIf="lots.length > 0">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nom</th>
-          <th>Race</th>
-          <th>Date d'achat</th>
-          <th>Nombre d'akoho</th>
-          <th>Âge</th>
-          <th>Prix d'achat</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let lot of lots">
-          <td>{{ lot.id }}</td>
-          <td>{{ lot.name }}</td>
-          <td>{{ lot.race_nom }}</td>
-          <td>{{ lot.date_achat | date:'dd/MM/yyyy' }}</td>
-          <td>{{ lot.nombre_akoho }}</td>
-          <td>{{ lot.age }}</td>
-          <td>{{ lot.prix_achat | number:'1.2-2' }} Ar</td>
-        </tr>
-      </tbody>
-    </table>
-    
-    <p *ngIf="lots.length === 0" class="no-data">Aucun lot enregistré.</p>
-  </div>
+    <div class="form-section">
+        <h3>Ajouter un nouveau lot</h3>
+        <app-lots-form (lotCreated)="onLotCreated()"></app-lots-form>
+    </div>
+
+    <div class="list-section">
+        <h3>Liste des lots</h3>
+        <p *ngIf="message" class="success-message">{{ message }}</p>
+
+        <table *ngIf="lots.length > 0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Race</th>
+                    <th>Date d'achat</th>
+                    <th>Nombre d'akoho</th>
+                    <th>Âge</th>
+                    <th>Prix d'achat</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let lot of lots">
+                    <td>{{ lot.id }}</td>
+                    <td>{{ lot.name }}</td>
+                    <td>{{ lot.race_nom }}</td>
+                    <td>{{ lot.date_achat | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ lot.nombre_akoho }}</td>
+                    <td>{{ lot.age }}</td>
+                    <td>{{ lot.prix_achat | number:'1.2-2' }} Ar</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p *ngIf="lots.length === 0" class="no-data">Aucun lot enregistré.</p>
+    </div>
 </div>

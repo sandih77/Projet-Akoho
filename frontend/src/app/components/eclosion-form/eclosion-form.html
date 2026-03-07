@@ -1,0 +1,21 @@
+<form [formGroup]="eclosionForm" (ngSubmit)="onSubmit()">
+    <div>
+        <label for="lot">Lot :</label>
+        <select id="lot" formControlName="lot_id">
+            <option [value]="0" disabled>Choisir un lot</option>
+            <option *ngFor="let lot of lots" [value]="lot.id">{{ lot.name }} ({{ lot.race_nom }})</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="date_eclosion">Date d'éclosion :</label>
+        <input id="date_eclosion" formControlName="date_eclosion" type="date" />
+    </div>
+
+    <div>
+        <label for="nombre_foy">Nombre éclos :</label>
+        <input id="nombre_foy" formControlName="nombre_foy" type="number" />
+    </div>
+
+    <button type="submit">Enregistrer</button>
+</form>

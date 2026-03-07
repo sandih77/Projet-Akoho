@@ -1,0 +1,21 @@
+<form [formGroup]="atodyForm" (ngSubmit)="onSubmit()">
+    <div>
+        <label for="lot">Lot :</label>
+        <select id="lot" formControlName="lot_id">
+            <option [value]="0" disabled>Choisir un lot</option>
+            <option *ngFor="let lot of lots" [value]="lot.id">{{ lot.name }} ({{ lot.race_nom }})</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="date_production">Date de production :</label>
+        <input id="date_production" formControlName="date_production" type="date" />
+    </div>
+
+    <div>
+        <label for="nombre_atody">Nombre d'œufs :</label>
+        <input id="nombre_atody" formControlName="nombre_atody" type="number" />
+    </div>
+
+    <button type="submit">Enregistrer</button>
+</form>

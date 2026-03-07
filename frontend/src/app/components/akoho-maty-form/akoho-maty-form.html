@@ -1,0 +1,21 @@
+<form [formGroup]="akohoMatyForm" (ngSubmit)="onSubmit()">
+    <div>
+        <label for="lot">Lot :</label>
+        <select id="lot" formControlName="lot_id">
+            <option [value]="0" disabled>Choisir un lot</option>
+            <option *ngFor="let lot of lots" [value]="lot.id">{{ lot.name }} ({{ lot.race_nom }})</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="date_maty">Date de mort :</label>
+        <input id="date_maty" formControlName="date_maty" type="date" />
+    </div>
+
+    <div>
+        <label for="nombre">Nombre de morts :</label>
+        <input id="nombre" formControlName="nombre" type="number" />
+    </div>
+
+    <button type="submit">Enregistrer</button>
+</form>
