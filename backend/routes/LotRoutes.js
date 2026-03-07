@@ -1,5 +1,5 @@
 import express from "express";
-import LotController from "../controllers/LotController";
+import LotController from "../controllers/LotController.js";
 const router = express.Router();
 
 router.post("/create-lot", LotController.create);

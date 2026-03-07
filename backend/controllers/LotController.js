@@ -1,4 +1,4 @@
-import LotModel from "../models/LotModel";
+import LotModel from "../models/LotModel.js";
 
 export default class LotController {
     static create(req, res) {

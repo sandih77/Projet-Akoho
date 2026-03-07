@@ -1,4 +1,4 @@
-import RaceModel from "../models/RaceModel";
+import RaceModel from "../models/RaceModel.js";
 
 export default class RaceController {
     static create(req, res) {

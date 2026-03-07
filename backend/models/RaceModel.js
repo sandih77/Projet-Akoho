@@ -1,6 +1,8 @@
-import db from "../config/db";
+import Database from "../config/db.js";
 
-export default class RaceModel {
+const db = Database.getSql();
+
+class RaceModel {
     constructor(nom, pu_sakafo_par_gramme, pv_par_gramme, pu_atody) {
         this.nom = nom;
         this.pu_sakafo_par_gramme = pu_sakafo_par_gramme;
@@ -21,3 +23,4 @@ export default class RaceModel {
         });
     }
 }
+export default RaceModel;

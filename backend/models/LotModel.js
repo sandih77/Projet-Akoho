@@ -1,6 +1,8 @@
-const db = require("../config/db");
+import Darabase from "../config/db.js";
 
-export default class LotModel {
+const db = Darabase.getSql();
+
+class LotModel {
     constructor(name, race_id, date_achat, nombre_akoho, age, prix_achat) {
         this.name = name;
         this.race_id = race_id;
@@ -23,3 +25,4 @@ export default class LotModel {
         });
     }
 }
+export default LotModel;

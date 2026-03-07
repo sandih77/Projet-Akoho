@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import LotsRoutes from "./routes/LotRoutes";
+import LotsRoutes from "./routes/LotRoutes.js";
 
 const app = express();
 const PORT = 3000;
