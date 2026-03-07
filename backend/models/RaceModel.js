@@ -3,7 +3,7 @@ import Database from '../config/db.js';
 export default class RaceModel {
     static async create(raceData) {
         try {
-            const pool = await Database.getPool(); // récupère la connexion
+            const pool = await Database.getPool();
             const request = pool.request();
 
             request.input('nom', Database.getSql().VarChar, raceData.nom);
@@ -19,6 +19,17 @@ export default class RaceModel {
             return { message: 'Race créée avec succès !', race: raceData };
         } catch (err) {
             console.error('Erreur création race:', err);
+            throw err;
+        }
+    }
+
+    static async getAll() {
+        try {
+            const pool = await Database.getPool();
+            const result = await pool.request().query('SELECT * FROM Race');
+            return result.recordset;
+        } catch (err) {
+            console.error('Erreur récupération races:', err);
             throw err;
         }
     }

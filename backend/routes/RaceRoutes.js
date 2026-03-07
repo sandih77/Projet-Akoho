@@ -9,6 +9,7 @@ export default class RaceRoutes {
 
     initRoutes() {
         this.router.post('/create-race', RaceController.create);
+        this.router.get('/list-races', RaceController.getAll);
     }
 
     getRouter() {

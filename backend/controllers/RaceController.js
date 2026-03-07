@@ -9,4 +9,13 @@ export default class RaceController {
             res.status(500).json({ error: 'Erreur serveur', details: err.message });
         }
     }
+
+    static async getAll(req, res) {
+        try {
+            const races = await RaceModel.getAll();
+            res.status(200).json(races);
+        } catch (err) {
+            res.status(500).json({ error: 'Erreur serveur', details: err.message });
+        }
+    }
 }

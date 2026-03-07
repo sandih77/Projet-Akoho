@@ -14,4 +14,8 @@ export class RaceService {
     createRace(race: Race): Observable<any> {
         return this.http.post(`${this.apiUrl}/create-race`, race);
     }
+
+    getAllRaces(): Observable<Race[]> {
+        return this.http.get<Race[]>(`${this.apiUrl}/list-races`);
+    }
 }

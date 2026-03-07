@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RaceService } from '../../services/race.services';
 
@@ -11,6 +11,7 @@ import { RaceService } from '../../services/race.services';
 
 export class RaceForm {
   raceForm: FormGroup;
+  @Output() raceCreated = new EventEmitter<void>();
 
   constructor(private fb: FormBuilder, private raceService: RaceService) {
     this.raceForm = this.fb.group({
@@ -26,6 +27,8 @@ export class RaceForm {
       this.raceService.createRace(this.raceForm.value).subscribe({
         next: (res) => {
           console.log('Race créée:', res);
+          this.raceForm.reset(); 
+          this.raceCreated.emit(); 
         },
         error: (err) => {
           console.error('Erreur lors de la création:', err);
