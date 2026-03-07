@@ -4,8 +4,33 @@ export default class AtodyModel {
     static async create(atodyData) {
         try {
             const pool = await Database.getPool();
+            
+            // Vérifier que le lot existe et récupérer sa date d'achat
+            const checkLotRequest = pool.request();
+            checkLotRequest.input('lot_id', Database.getSql().Int, atodyData.lot_id);
+            const lotResult = await checkLotRequest.query(
+                'SELECT date_achat, name FROM Lot WHERE id = @lot_id'
+            );
+            
+            if (lotResult.recordset.length === 0) {
+                throw new Error('Lot non trouvé');
+            }
+            
+            const dateAchat = new Date(lotResult.recordset[0].date_achat);
+            const dateProduction = new Date(atodyData.date_production);
+            const lotName = lotResult.recordset[0].name;
+            
+            // Vérifier que la date de production n'est pas antérieure à la date d'achat
+            if (dateProduction < dateAchat) {
+                throw new Error(
+                    `Impossible: la date de production (${dateProduction.toLocaleDateString('fr-FR')}) ` +
+                    `est antérieure à la date d'achat du lot "${lotName}" ` +
+                    `(${dateAchat.toLocaleDateString('fr-FR')}). ` +
+                    `Le lot n'existait pas encore à cette date.`
+                );
+            }
+            
             const request = pool.request();
-
             request.input('lot_id', Database.getSql().Int, atodyData.lot_id);
             request.input('date_production', Database.getSql().Date, atodyData.date_production);
             request.input('nombre_atody', Database.getSql().Int, atodyData.nombre_atody);

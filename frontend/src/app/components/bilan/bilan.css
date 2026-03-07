@@ -1,0 +1,170 @@
+.bilan-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.bilan-container h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+form {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+}
+
+form div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+form label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+form select,
+form input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+form button {
+    padding: 10px 30px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+form button:hover:not(:disabled) {
+    background-color: #45a049;
+}
+
+form button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border-left: 4px solid #c62828;
+}
+
+.bilan-results {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.bilan-results h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #4CAF50;
+}
+
+.bilan-section {
+    margin-bottom: 30px;
+    background: #fafafa;
+    padding: 15px;
+    border-radius: 6px;
+}
+
+.bilan-section h4 {
+    color: #34495e;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.bilan-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.bilan-table tr {
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.bilan-table tr:last-child {
+    border-bottom: none;
+}
+
+.bilan-table td {
+    padding: 12px;
+}
+
+.bilan-table td:first-child {
+    color: #666;
+    width: 40%;
+}
+
+.bilan-table td:last-child {
+    text-align: right;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.highlight-success {
+    color: #2e7d32 !important;
+    font-weight: bold;
+}
+
+.highlight-danger {
+    color: #c62828 !important;
+    font-weight: bold;
+}
+
+.bilan-summary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.bilan-summary h4 {
+    color: white;
+}
+
+.bilan-summary .bilan-table td {
+    color: white;
+    border-bottom-color: rgba(255,255,255,0.2);
+}
+
+.bilan-summary .bilan-table td:first-child {
+    color: rgba(255,255,255,0.9);
+}
+
+.bilan-summary .highlight-success {
+    color: #a5d6a7 !important;
+}
+
+.bilan-summary .highlight-danger {
+    color: #ef9a9a !important;
+}
+
+.total-row {
+    border-top: 3px solid rgba(255,255,255,0.5) !important;
+    font-size: 18px;
+}
+
+.total-row td {
+    padding-top: 15px !important;
+}

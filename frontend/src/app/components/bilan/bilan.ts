@@ -57,7 +57,25 @@ export class Bilan {
         },
         error: (err: any) => {
           console.error('Erreur récupération bilan', err);
-          this.errorMessage = 'Erreur lors de la récupération du bilan. Veuillez réessayer.';
+          
+          // Extraire le message d'erreur du backend
+          let errorMsg = 'Erreur lors de la récupération du bilan. Veuillez réessayer.';
+          
+          if (err.error) {
+            if (typeof err.error === 'string') {
+              errorMsg = err.error;
+            } else if (err.error.details) {
+              errorMsg = err.error.details;
+            } else if (err.error.error) {
+              errorMsg = err.error.error;
+            } else if (err.error.message) {
+              errorMsg = err.error.message;
+            }
+          } else if (err.message) {
+            errorMsg = err.message;
+          }
+          
+          this.errorMessage = errorMsg;
           this.isLoading = false;
         }
       });

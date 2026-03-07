@@ -15,16 +15,25 @@
         <tr>
           <th>ID</th>
           <th>Lot</th>
-          <th>Date de production</th>
+          <th>Date</th>
+          <th>Type</th>
           <th>Nombre d'œufs</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let atody of atodyList">
+        <tr *ngFor="let atody of atodyList" [class.eclosion]="atody.nombre_atody < 0">
           <td>{{ atody.id }}</td>
           <td>{{ atody.lot_nom }}</td>
           <td>{{ atody.date_production | date:'dd/MM/yyyy' }}</td>
-          <td>{{ atody.nombre_atody }}</td>
+          <td>
+            <span [class.badge-production]="atody.nombre_atody > 0" 
+                  [class.badge-eclosion]="atody.nombre_atody < 0">
+              {{ atody.nombre_atody > 0 ? 'Production' : 'Éclosion' }}
+            </span>
+          </td>
+          <td [class.positive]="atody.nombre_atody > 0" [class.negative]="atody.nombre_atody < 0">
+            {{ atody.nombre_atody > 0 ? '+' : '' }}{{ atody.nombre_atody }}
+          </td>
         </tr>
       </tbody>
     </table>

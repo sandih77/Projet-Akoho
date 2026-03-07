@@ -4,8 +4,42 @@ export default class AkohoMatyModel {
     static async create(akohoMatyData) {
         try {
             const pool = await Database.getPool();
+            
+            // Vérifier que le lot existe et récupérer sa date d'achat
+            const checkLotRequest = pool.request();
+            checkLotRequest.input('lot_id', Database.getSql().Int, akohoMatyData.lot_id);
+            const lotResult = await checkLotRequest.query(
+                'SELECT date_achat, name, nombre_akoho FROM Lot WHERE id = @lot_id'
+            );
+            
+            if (lotResult.recordset.length === 0) {
+                throw new Error('Lot non trouvé');
+            }
+            
+            const dateAchat = new Date(lotResult.recordset[0].date_achat);
+            const dateMaty = new Date(akohoMatyData.date_maty);
+            const lotName = lotResult.recordset[0].name;
+            const nombreAkohoActuel = lotResult.recordset[0].nombre_akoho;
+            
+            // Vérifier que la date de mortalité n'est pas antérieure à la date d'achat
+            if (dateMaty < dateAchat) {
+                throw new Error(
+                    `Impossible: la date de mortalité (${dateMaty.toLocaleDateString('fr-FR')}) ` +
+                    `est antérieure à la date d'achat du lot "${lotName}" ` +
+                    `(${dateAchat.toLocaleDateString('fr-FR')}). ` +
+                    `Le lot n'existait pas encore à cette date.`
+                );
+            }
+            
+            // Vérifier qu'il y a assez d'akoho vivants
+            if (nombreAkohoActuel < akohoMatyData.nombre) {
+                throw new Error(
+                    `Impossible: le lot "${lotName}" n'a que ${nombreAkohoActuel} akoho(s) vivant(s), ` +
+                    `mais vous essayez d'en déclarer ${akohoMatyData.nombre} mort(s)`
+                );
+            }
+            
             const request = pool.request();
-
             request.input('lot_id', Database.getSql().Int, akohoMatyData.lot_id);
             request.input('date_maty', Database.getSql().Date, akohoMatyData.date_maty);
             request.input('nombre', Database.getSql().Int, akohoMatyData.nombre);
@@ -13,11 +47,21 @@ export default class AkohoMatyModel {
             const result = await request.query(
                 `INSERT INTO Akoho_Maty (lot_id, date_maty, nombre)
                  VALUES (@lot_id, @date_maty, @nombre);
+                 
+                 UPDATE Lot 
+                 SET nombre_akoho = nombre_akoho - @nombre 
+                 WHERE id = @lot_id;
+                 
                  SELECT SCOPE_IDENTITY() AS id;`
             );
 
             const insertedId = result.recordset[0].id;
-            return { message: 'Akoho Maty créé avec succès !', akoho_maty: { id: insertedId, ...akohoMatyData } };
+            const nouveauNombre = nombreAkohoActuel - akohoMatyData.nombre;
+            return { 
+                message: `Akoho Maty créé avec succès ! ${akohoMatyData.nombre} akoho(s) mort(s) déclaré(s). Il reste ${nouveauNombre} akoho(s) vivant(s) dans le lot "${lotName}".`, 
+                akoho_maty: { id: insertedId, ...akohoMatyData },
+                nombre_vivants_restants: nouveauNombre
+            };
         } catch (err) {
             console.error('Erreur création akoho maty:', err);
             throw err;

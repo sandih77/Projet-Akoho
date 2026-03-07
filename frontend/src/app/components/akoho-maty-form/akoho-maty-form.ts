@@ -16,6 +16,8 @@ import { AkohoMaty } from '../../models/akoho-maty.model';
 export class AkohoMatyForm implements OnInit {
   lots: Lots[] = [];
   akohoMatyForm: FormGroup;
+  errorMessage: string = '';
+  successMessage: string = '';
 
   @Output() akohoMatyCreated = new EventEmitter<void>();
 
@@ -40,20 +42,50 @@ export class AkohoMatyForm implements OnInit {
 
   onSubmit(): void {
     if (this.akohoMatyForm.valid) {
+      this.errorMessage = '';
+      this.successMessage = '';
+      
       this.akohoMatyService.create(this.akohoMatyForm.value as AkohoMaty).subscribe({
         next: (res: any) => {
           console.log('Akoho Maty créé:', res);
+          this.successMessage = res.message || 'Akoho Maty créé avec succès !';
           this.akohoMatyForm.reset({
             lot_id: 0,
             date_maty: '',
             nombre: 0
           });
           this.akohoMatyCreated.emit();
+          
+          // Effacer le message de succès après 3 secondes
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 3000);
         },
-        error: (err: any) => console.error('Erreur création akoho maty:', err)
+        error: (err: any) => {
+          console.error('Erreur création akoho maty:', err);
+          
+          // Extraire le message d'erreur du backend
+          if (err.error) {
+            if (typeof err.error === 'string') {
+              this.errorMessage = err.error;
+            } else if (err.error.details) {
+              this.errorMessage = err.error.details;
+            } else if (err.error.error) {
+              this.errorMessage = err.error.error;
+            } else if (err.error.message) {
+              this.errorMessage = err.error.message;
+            } else {
+              this.errorMessage = 'Erreur lors de la création de l\'akoho maty.';
+            }
+          } else if (err.message) {
+            this.errorMessage = err.message;
+          } else {
+            this.errorMessage = 'Erreur lors de la création de l\'akoho maty.';
+          }
+        }
       });
     } else {
-      console.log('Formulaire invalide !');
+      this.errorMessage = 'Veuillez remplir tous les champs requis.';
     }
   }
 }

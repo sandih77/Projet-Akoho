@@ -58,6 +58,19 @@ export default class BilanModel {
             if (!lotInfo) {
                 return null;
             }
+            
+            // Vérifier que la date du bilan n'est pas antérieure à la date d'achat
+            const dateAchat = new Date(lotInfo.date_achat);
+            const dateBilanDate = new Date(dateBilan);
+            
+            if (dateBilanDate < dateAchat) {
+                throw new Error(
+                    `Impossible: la date du bilan (${dateBilanDate.toLocaleDateString('fr-FR')}) ` +
+                    `est antérieure à la date d'achat du lot "${lotInfo.lot_name}" ` +
+                    `(${dateAchat.toLocaleDateString('fr-FR')}). ` +
+                    `Le lot n'existait pas encore à cette date.`
+                );
+            }
 
             // 2. Récupérer les données de sakafo
             const sakafoData = await LotModel.getSakafoByLotAndDate(lotId, dateBilan);

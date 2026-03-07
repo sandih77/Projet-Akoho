@@ -1,1 +1,84 @@
 /* Styles pour atody-manager */
+
+.atody-manager {
+    padding: 20px;
+}
+
+.form-section,
+.list-section {
+    margin-bottom: 30px;
+}
+
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+thead {
+    background-color: #f8f9fa;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+
+th {
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Ligne d'éclosion (négative) */
+tr.eclosion {
+    background-color: #fff3cd;
+}
+
+/* Badge pour le type */
+.badge-production,
+.badge-eclosion {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-production {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.badge-eclosion {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Couleurs pour les nombres */
+td.positive {
+    color: #28a745;
+    font-weight: 600;
+}
+
+td.negative {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.no-data {
+    text-align: center;
+    color: #6c757d;
+    padding: 20px;
+    font-style: italic;
+}
+

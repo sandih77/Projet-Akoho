@@ -16,6 +16,8 @@ import { Eclosion } from '../../models/eclosion.model';
 export class EclosionForm implements OnInit {
   lots: Lots[] = [];
   eclosionForm: FormGroup;
+  errorMessage: string = '';
+  successMessage: string = '';
 
   @Output() eclosionCreated = new EventEmitter<void>();
 
@@ -41,9 +43,13 @@ export class EclosionForm implements OnInit {
 
   onSubmit(): void {
     if (this.eclosionForm.valid) {
+      this.errorMessage = '';
+      this.successMessage = '';
+      
       this.eclosionService.create(this.eclosionForm.value as Eclosion).subscribe({
         next: (res: any) => {
           console.log('Eclosion créée:', res);
+          this.successMessage = res.message || 'Eclosion créée avec succès !';
           this.eclosionForm.reset({
             lot_id: 0,
             date_eclosion: '',
@@ -51,11 +57,37 @@ export class EclosionForm implements OnInit {
             nombre_tsy_foy: 0
           });
           this.eclosionCreated.emit();
+          
+          // Effacer le message de succès après 3 secondes
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 3000);
         },
-        error: (err: any) => console.error('Erreur création eclosion:', err)
+        error: (err: any) => {
+          console.error('Erreur création eclosion:', err);
+          
+          // Extraire le message d'erreur du backend
+          if (err.error) {
+            if (typeof err.error === 'string') {
+              this.errorMessage = err.error;
+            } else if (err.error.details) {
+              this.errorMessage = err.error.details;
+            } else if (err.error.error) {
+              this.errorMessage = err.error.error;
+            } else if (err.error.message) {
+              this.errorMessage = err.error.message;
+            } else {
+              this.errorMessage = 'Erreur lors de la création de l\'eclosion.';
+            }
+          } else if (err.message) {
+            this.errorMessage = err.message;
+          } else {
+            this.errorMessage = 'Erreur lors de la création de l\'eclosion.';
+          }
+        }
       });
     } else {
-      console.log('Formulaire invalide !');
+      this.errorMessage = 'Veuillez remplir tous les champs requis.';
     }
   }
 }
