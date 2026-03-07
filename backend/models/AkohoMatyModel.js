@@ -44,4 +44,25 @@ export default class AkohoMatyModel {
             throw err;
         }
     }
+
+    static async getTotalByLotAndDate(lotId, dateBilan) {
+        try {
+            const pool = await Database.getPool();
+            const request = pool.request();
+            
+            request.input('lot_id', Database.getSql().Int, lotId);
+            request.input('date_bilan', Database.getSql().Date, dateBilan);
+            
+            const result = await request.query(`
+                SELECT ISNULL(SUM(nombre), 0) AS total_akoho_maty
+                FROM Akoho_Maty 
+                WHERE lot_id = @lot_id AND date_maty <= @date_bilan
+            `);
+            
+            return result.recordset[0]?.total_akoho_maty || 0;
+        } catch (err) {
+            console.error('Erreur récupération total akoho maty:', err);
+            throw err;
+        }
+    }
 }

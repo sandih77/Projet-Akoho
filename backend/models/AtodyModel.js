@@ -45,15 +45,23 @@ export default class AtodyModel {
         }
     }
 
-    static async getNbrAtodyByLot(lot_id) {
+    static async getTotalByLotAndDate(lotId, dateBilan) {
         try {
             const pool = await Database.getPool();
-            request.input('lot_id', lot_id);
-            const result = await pool.request().query(`
-                SELECT SUM(nombre_atody) FROM Atody WHERE lot_id = @lot_id
+            const request = pool.request();
+            
+            request.input('lot_id', Database.getSql().Int, lotId);
+            request.input('date_bilan', Database.getSql().Date, dateBilan);
+            
+            const result = await request.query(`
+                SELECT ISNULL(SUM(nombre_atody), 0) AS total_atody
+                FROM Atody 
+                WHERE lot_id = @lot_id AND date_production <= @date_bilan
             `);
-            return result.recordset;
+            
+            return result.recordset[0]?.total_atody || 0;
         } catch (err) {
+            console.error('Erreur récupération total atody:', err);
             throw err;
         }
     }

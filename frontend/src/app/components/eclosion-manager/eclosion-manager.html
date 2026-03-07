@@ -1,6 +1,6 @@
 <div class="eclosion-manager">
   <h2>Gestion des Éclosions</h2>
-  
+
   <div class="form-section">
     <h3>Ajouter une éclosion</h3>
     <app-eclosion-form (eclosionCreated)="onEclosionCreated()"></app-eclosion-form>
@@ -9,7 +9,7 @@
   <div class="list-section">
     <h3>Liste des éclosions</h3>
     <p *ngIf="message" class="success-message">{{ message }}</p>
-    
+
     <table *ngIf="eclosionList.length > 0">
       <thead>
         <tr>
@@ -17,8 +17,6 @@
           <th>Lot</th>
           <th>Date d'éclosion</th>
           <th>Nombre éclos</th>
-          <th>Nombre non éclos</th>
-          <th>Total</th>
         </tr>
       </thead>
       <tbody>
@@ -27,12 +25,10 @@
           <td>{{ eclosion.lot_nom }}</td>
           <td>{{ eclosion.date_eclosion | date:'dd/MM/yyyy' }}</td>
           <td>{{ eclosion.nombre_foy }}</td>
-          <td>{{ eclosion.nombre_tsy_foy }}</td>
-          <td>{{ eclosion.nombre_foy + eclosion.nombre_tsy_foy }}</td>
         </tr>
       </tbody>
     </table>
-    
+
     <p *ngIf="eclosionList.length === 0" class="no-data">Aucune éclosion enregistrée.</p>
   </div>
 </div>

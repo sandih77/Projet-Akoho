@@ -1,0 +1,126 @@
+<div class="bilan-container">
+    <h2>Bilan de Lot</h2>
+    
+    <form [formGroup]="bilanForm" (ngSubmit)="onSubmit()">
+        <div>
+            <label for="lot">Lot :</label>
+            <select id="lot" formControlName="lot_id">
+                <option [value]="0" disabled>Choisir un lot</option>
+                <option *ngFor="let lot of lots" [value]="lot.id">{{ lot.name }} ({{ lot.race_nom }})</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="date_bilan">Date :</label>
+            <input id="date_bilan" formControlName="date_bilan" type="date" />
+        </div>
+
+        <button type="submit" [disabled]="isLoading">
+            {{ isLoading ? 'Chargement...' : 'Voir stats' }}
+        </button>
+    </form>
+
+    <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+    </div>
+
+    <div *ngIf="bilanData" class="bilan-results">
+        <h3>Résultats du Bilan - {{ bilanData.lot_name }} ({{ bilanData.race_nom }})</h3>
+        
+        <div class="bilan-section">
+            <h4>Informations Générales</h4>
+            <table class="bilan-table">
+                <tr>
+                    <td><strong>Date d'achat:</strong></td>
+                    <td>{{ bilanData.date_achat | date: 'dd/MM/yyyy' }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Âge initial:</strong></td>
+                    <td>{{ bilanData.age_initial }} semaines</td>
+                </tr>
+                <tr>
+                    <td><strong>Semaines écoulées:</strong></td>
+                    <td>{{ bilanData.semaines_ecoulees }} semaines</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="bilan-section">
+            <h4>Akoho (Poulets)</h4>
+            <table class="bilan-table">
+                <tr>
+                    <td><strong>Nombre initial:</strong></td>
+                    <td>{{ bilanData.nombre_initial_akoho }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Nombre akoho maty (morts):</strong></td>
+                    <td class="highlight-danger">{{ bilanData.nombre_akoho_maty }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Nombre akoho vivants:</strong></td>
+                    <td class="highlight-success">{{ bilanData.nombre_akoho_vivants }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Poids moyen par akoho:</strong></td>
+                    <td>{{ bilanData.poids_moyen_par_akoho | number: '1.2-2' }} g</td>
+                </tr>
+                <tr>
+                    <td><strong>Prix de vente total akoho:</strong></td>
+                    <td>{{ bilanData.pv_total_akoho | number: '1.2-2' }} Ar</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="bilan-section">
+            <h4>Sakafo (Nourriture)</h4>
+            <table class="bilan-table">
+                <tr>
+                    <td><strong>Poids total sakafo:</strong></td>
+                    <td>{{ bilanData.sakafo_poids | number: '1.2-2' }} g</td>
+                </tr>
+                <tr>
+                    <td><strong>Coût total sakafo:</strong></td>
+                    <td>{{ bilanData.sakafo_cout | number: '1.2-2' }} Ar</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="bilan-section">
+            <h4>Atody (Œufs)</h4>
+            <table class="bilan-table">
+                <tr>
+                    <td><strong>Nombre atody:</strong></td>
+                    <td>{{ bilanData.nombre_atody }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Coût total atody:</strong></td>
+                    <td>{{ bilanData.cout_total_atody | number: '1.2-2' }} Ar</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="bilan-section bilan-summary">
+            <h4>Résumé Financier</h4>
+            <table class="bilan-table">
+                <tr>
+                    <td><strong>Coût d'achat:</strong></td>
+                    <td>{{ bilanData.cout_achat | number: '1.2-2' }} Ar</td>
+                </tr>
+                <tr>
+                    <td><strong>Dépenses totales:</strong></td>
+                    <td class="highlight-danger">{{ bilanData.depenses_totales | number: '1.2-2' }} Ar</td>
+                </tr>
+                <tr>
+                    <td><strong>Revenus totaux:</strong></td>
+                    <td class="highlight-success">{{ bilanData.revenus_totaux | number: '1.2-2' }} Ar</td>
+                </tr>
+                <tr class="total-row">
+                    <td><strong>Bénéfices:</strong></td>
+                    <td [class]="bilanData.benefices >= 0 ? 'highlight-success' : 'highlight-danger'">
+                        <strong>{{ bilanData.benefices | number: '1.2-2' }} Ar</strong>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
