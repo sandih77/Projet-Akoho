@@ -48,3 +48,16 @@
 - Lot
 - Date
 - Nombre atody
+
+Maintenant on va gerer la table configuration pour avoir une meilleure bilan
+poids moyen dans une lot = somme (variation_poids)
+Dans bilan il faut avoir le nombre de semaine ecoulé exacte avec jours 
+gerne 2 semaines et 5 jours 
+donc il faut calculer son poids et son sakafoparsemaine juste pour 5 jours
+genre on le divise par et 7 et multipliant par 5
+Faut bien gerer aussi la semaine
+Semaine 0 : commence par la date achat et ainsi de suite
+exemple : date achat 13 avril
+semaine0 : 13 avril au 20avril
+semaine1 : 20 avril au 27avril
+semaine3 : 27avril au 4mai 

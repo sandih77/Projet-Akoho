@@ -39,8 +39,14 @@
                     <td>{{ bilanData.age_initial }} semaines</td>
                 </tr>
                 <tr>
-                    <td><strong>Semaines écoulées:</strong></td>
-                    <td>{{ bilanData.semaines_ecoulees }} semaines</td>
+                    <td><strong>Durée écoulée:</strong></td>
+                    <td>
+                        <span *ngIf="bilanData.semaines_ecoulees > 0">{{ bilanData.semaines_ecoulees }} semaine{{ bilanData.semaines_ecoulees > 1 ? 's' : '' }}</span>
+                        <span *ngIf="bilanData.semaines_ecoulees > 0 && bilanData.jours_ecoules > 0"> et </span>
+                        <span *ngIf="bilanData.jours_ecoules > 0">{{ bilanData.jours_ecoules }} jour{{ bilanData.jours_ecoules > 1 ? 's' : '' }}</span>
+                        <span *ngIf="bilanData.semaines_ecoulees === 0 && bilanData.jours_ecoules === 0">0 jour</span>
+                        <span class="duree-detail">({{ bilanData.total_jours }} jours au total)</span>
+                    </td>
                 </tr>
             </table>
         </div>
@@ -62,7 +68,7 @@
                 </tr>
                 <tr>
                     <td><strong>Poids moyen par akoho:</strong></td>
-                    <td>{{ bilanData.poids_moyen_par_akoho | number: '1.2-2' }} g</td>
+                    <td>{{ bilanData.poids_moyen | number: '1.2-2' }} g</td>
                 </tr>
                 <tr>
                     <td><strong>Prix de vente total akoho:</strong></td>

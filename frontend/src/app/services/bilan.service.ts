@@ -11,11 +11,13 @@ export interface BilanData {
     age_initial: number;
     date_achat: string;
     semaines_ecoulees: number;
+    jours_ecoules: number;
+    total_jours: number;
     nombre_akoho_vivants: number;
     nombre_akoho_maty: number;
     sakafo_poids: number;
     sakafo_cout: number;
-    poids_moyen_par_akoho: number;
+    poids_moyen: number;
     pv_total_akoho: number;
     nombre_atody: number;
     cout_total_atody: number;

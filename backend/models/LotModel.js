@@ -82,28 +82,23 @@ export default class LotModel {
         }
     }
 
-    static async getSakafoByLotAndDate(lotId, dateBilan) {
+    static async getConfigurationsByLot(lotId) {
         try {
             const pool = await Database.getPool();
             const request = pool.request();
             
             request.input('lot_id', Database.getSql().Int, lotId);
-            request.input('date_bilan', Database.getSql().Date, dateBilan);
             
             const result = await request.query(`
-                SELECT 
-                    ISNULL(SUM(C.sakafo_semaine), 0) AS total_poids_sakafo,
-                    ISNULL(SUM(C.variation_poids), 0) AS poids_total_variation
-                FROM Lot L
-                LEFT JOIN Configuration C ON C.lot_id = L.id 
-                    AND C.semaine <= DATEDIFF(WEEK, L.date_achat, @date_bilan)
-                WHERE L.id = @lot_id
-                GROUP BY L.id
+                SELECT semaine, variation_poids, sakafo_semaine
+                FROM Configuration
+                WHERE lot_id = @lot_id
+                ORDER BY semaine ASC
             `);
             
-            return result.recordset[0] || { total_poids_sakafo: 0, poids_total_variation: 0 };
+            return result.recordset;
         } catch (err) {
-            console.error('Erreur récupération sakafo:', err);
+            console.error('Erreur récupération configurations:', err);
             throw err;
         }
     }
