@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Race } from '../../models/race.model';
 import { RaceService } from '../../services/race.services';
 import { CommonModule } from '@angular/common';
@@ -14,7 +14,7 @@ export class RacesManager implements OnInit {
   races: Race[] = [];
   message = '';
 
-  constructor(private raceService: RaceService) { }
+  constructor(private raceService: RaceService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.loadRaces();
@@ -24,20 +24,21 @@ export class RacesManager implements OnInit {
     this.raceService.getAllRaces().subscribe({
       next: (data) => {
         this.races = data;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Erreur récupération races:', err);
+        this.cdr.detectChanges();
       }
     });
   }
 
   onRaceCreated(): void {
     this.message = 'Race créée avec succès !';
-    // Recharger la liste pour avoir les IDs corrects
     this.loadRaces();
-    // Effacer le message après 3 secondes
     setTimeout(() => {
       this.message = '';
+      this.cdr.detectChanges();
     }, 3000);
   }
 }

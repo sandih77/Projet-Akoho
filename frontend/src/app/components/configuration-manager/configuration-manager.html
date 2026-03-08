@@ -8,16 +8,15 @@
   <!-- ── Form card ─────────────────────────────────────── -->
   <div class="card">
     <h3 class="card-title"><i class="fas fa-plus-circle"></i> Nouvelle Configuration</h3>
-    <div *ngIf="message" class="alert alert-success">
-      <i class="fas fa-check-circle"></i> {{ message }}
-    </div>
+
     <app-configuration-form (configurationCreated)="onConfigurationCreated()"></app-configuration-form>
   </div>
 
   <!-- ── List card ──────────────────────────────────────── -->
   <div class="card">
-    <h3 class="card-title"><i class="fas fa-list"></i> Configurations enregistrées</h3>
-
+    <h3 class="card-title"><i class="fas fa-list"></i> Configurations enregistrées</h3>    <div *ngIf="message" class="alert alert-success">
+      <i class="fas fa-check-circle"></i> {{ message }}
+    </div>
     <ng-container *ngIf="groupedByLot.length > 0; else noData">
       <div *ngFor="let group of groupedByLot" class="lot-group">
 

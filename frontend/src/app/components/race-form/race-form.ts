@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RaceService } from '../../services/race.services';
 
@@ -13,7 +13,7 @@ export class RaceForm {
   raceForm: FormGroup;
   @Output() raceCreated = new EventEmitter<void>();
 
-  constructor(private fb: FormBuilder, private raceService: RaceService) {
+  constructor(private fb: FormBuilder, private raceService: RaceService, private cdr: ChangeDetectorRef) {
     this.raceForm = this.fb.group({
       'nom': ['', Validators.required],
       'pu_sakafo_par_gramme': [0, Validators.required],
@@ -29,9 +29,11 @@ export class RaceForm {
           console.log('Race créée:', res);
           this.raceForm.reset();
           this.raceCreated.emit();
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('Erreur lors de la création:', err);
+          this.cdr.detectChanges();
         }
       });
     } else {

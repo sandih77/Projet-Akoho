@@ -34,12 +34,17 @@ export default class BilanModel {
         let total_variation = 0;
 
         for (const config of configurations) {
-            if (config.semaine < semaines) {
-                // Semaine complète
+            if (config.semaine === 0) {
+                // Semaine 0 = poids initial uniquement, jamais de sakafo
+                total_variation += config.variation_poids || 0;
+
+            } else if (config.semaine <= semaines) {
+                // Semaine complète (semaine N≥1 est complète si N semaines se sont écoulées)
                 total_sakafo += config.sakafo_semaine || 0;
                 total_variation += config.variation_poids || 0;
-            } else if (config.semaine === semaines && jours > 0) {
-                // Semaine partielle : pro-rata (jours / 7)
+
+            } else if (config.semaine === semaines + 1 && jours > 0) {
+                // Semaine en cours (partielle) : pro-rata jours/7
                 total_sakafo += (config.sakafo_semaine || 0) * (jours / 7);
                 total_variation += (config.variation_poids || 0) * (jours / 7);
             }
@@ -79,7 +84,8 @@ export default class BilanModel {
             cout_total_atody: coutTotalAtody,
             revenus_totaux: revenustotaux,
             depenses_totales: depensesTotales,
-            benefices: benefices
+            benefices: benefices,
+            cout_achat: lotInfo.cout_achat
         };
     }
 

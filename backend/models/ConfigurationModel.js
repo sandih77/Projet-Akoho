@@ -4,8 +4,22 @@ export default class ConfigurationModel {
     static async create(configData) {
         try {
             const pool = await Database.getPool();
-            const request = pool.request();
 
+            // Unicité (lot_id, semaine) — vérification avant insertion
+            const checkReq = pool.request();
+            checkReq.input('lot_id_chk',  Database.getSql().Int, configData.lot_id);
+            checkReq.input('semaine_chk', Database.getSql().Int, configData.semaine);
+            const existing = await checkReq.query(
+                'SELECT COUNT(*) AS cnt FROM Configuration WHERE lot_id = @lot_id_chk AND semaine = @semaine_chk'
+            );
+            if (existing.recordset[0].cnt > 0) {
+                throw new Error(
+                    `Une configuration existe déjà pour ce lot à la semaine ${configData.semaine}. ` +
+                    `Supprimez-la avant d'en créer une nouvelle.`
+                );
+            }
+
+            const request = pool.request();
             request.input('lot_id', Database.getSql().Int, configData.lot_id);
             request.input('semaine', Database.getSql().Int, configData.semaine);
             request.input('variation_poids', Database.getSql().Decimal(10, 2), configData.variation_poids);

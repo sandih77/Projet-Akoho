@@ -18,10 +18,12 @@
       <label class="form-label" for="date_bilan">Date du bilan</label>
       <input class="form-control" id="date_bilan" formControlName="date_bilan" type="date" />
     </div>
-    <button class="btn btn-primary query-btn" type="submit" [disabled]="isLoading">
-      <i class="fas" [class.fa-chart-bar]="!isLoading" [class.fa-spinner]="isLoading" [class.fa-spin]="isLoading"></i>
-      {{ isLoading ? 'Calcul en cours…' : 'Calculer le bilan' }}
-    </button>
+    <div class="form-group">
+      <button class="btn btn-primary query-btn" type="submit" [disabled]="isLoading">
+        <i class="fas" [class.fa-chart-bar]="!isLoading" [class.fa-spinner]="isLoading" [class.fa-spin]="isLoading"></i>
+        {{ isLoading ? 'Calcul en cours…' : 'Calculer le bilan' }}
+      </button>
+    </div>
   </form>
 
   <div *ngIf="errorMessage" class="alert alert-danger" style="margin-top:16px">
@@ -35,7 +37,8 @@
   <div class="bilan-header-banner">
     <div>
       <div class="bilan-lot-name">{{ bilanData.lot_name }}</div>
-      <div class="bilan-race">Race : <strong>{{ bilanData.race_nom }}</strong> &nbsp;|&nbsp; Acheté le {{ bilanData.date_achat | date:'dd/MM/yyyy' }}</div>
+      <div class="bilan-race">Race : <strong>{{ bilanData.race_nom }}</strong> &nbsp;|&nbsp; Acheté le {{
+        bilanData.date_achat | date:'dd/MM/yyyy' }}</div>
     </div>
     <div class="bilan-duration">
       <div class="dur-main">
@@ -73,7 +76,7 @@
 
     <!-- Akoho section -->
     <div class="card">
-      <h3 class="card-title"><i class="fas fa-dove"></i> Akoho (Poulets)</h3>
+      <h3 class="card-title"><i class="fas fa-dove"></i> Akoho </h3>
       <dl class="detail-list">
         <div class="dl-row">
           <dt>Nombre initial</dt>
@@ -100,7 +103,7 @@
 
     <!-- Sakafo section -->
     <div class="card">
-      <h3 class="card-title"><i class="fas fa-seedling"></i> Sakafo (Nourriture)</h3>
+      <h3 class="card-title"><i class="fas fa-seedling"></i> Sakafo </h3>
       <dl class="detail-list">
         <div class="dl-row">
           <dt>Poids total consommé</dt>
@@ -115,7 +118,7 @@
 
     <!-- Atody section -->
     <div class="card">
-      <h3 class="card-title"><i class="fas fa-egg"></i> Atody (Œufs)</h3>
+      <h3 class="card-title"><i class="fas fa-egg"></i> Atody </h3>
       <dl class="detail-list">
         <div class="dl-row">
           <dt>Nombre net d'œufs</dt>
@@ -124,6 +127,16 @@
         <div class="dl-row highlight">
           <dt>Revenus œufs</dt>
           <dd>{{ bilanData.cout_total_atody | number:'1.0-0' }} Ar</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title"><i class="fas fa-box-open nav-icon"></i> Coût d'achat du lot</h3>
+      <dl class="detail-list">
+        <div class="dl-row benefice-row loss">
+          <dt>Coût d'achat du lot</dt>
+          <dd>{{ bilanData.cout_achat | number:'1.0-0' }} Ar</dd>
         </div>
       </dl>
     </div>
@@ -148,7 +161,8 @@
           <dt><strong>Revenus totaux</strong></dt>
           <dd class="text-success"><strong>{{ bilanData.revenus_totaux | number:'1.0-0' }} Ar</strong></dd>
         </div>
-        <div class="dl-row benefice-row" [class.profit]="bilanData.benefices >= 0" [class.loss]="bilanData.benefices < 0">
+        <div class="dl-row benefice-row" [class.profit]="bilanData.benefices >= 0"
+          [class.loss]="bilanData.benefices < 0">
           <dt><strong>Bénéfices nets</strong></dt>
           <dd>
             <strong>{{ bilanData.benefices >= 0 ? '+' : '' }}{{ bilanData.benefices | number:'1.0-0' }} Ar</strong>

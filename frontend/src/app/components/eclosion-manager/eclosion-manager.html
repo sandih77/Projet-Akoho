@@ -8,7 +8,6 @@
   <!-- Form card -->
   <div class="card">
     <h3 class="card-title"><i class="fas fa-plus-circle"></i> Nouvelle Éclosion</h3>
-    <div *ngIf="message" class="alert alert-success"><i class="fas fa-check-circle"></i> {{ message }}</div>
     <app-eclosion-form (eclosionCreated)="onEclosionCreated()"></app-eclosion-form>
   </div>
 

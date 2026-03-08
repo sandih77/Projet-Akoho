@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Eclosion } from '../../models/eclosion.model';
 import { EclosionService } from '../../services/eclosion.service';
 import { CommonModule } from '@angular/common';
@@ -14,7 +14,7 @@ export class EclosionManager implements OnInit {
   eclosionList: Eclosion[] = [];
   message = '';
 
-  constructor(private eclosionService: EclosionService) { }
+  constructor(private eclosionService: EclosionService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.loadEclosion();
@@ -24,18 +24,16 @@ export class EclosionManager implements OnInit {
     this.eclosionService.getAll().subscribe({
       next: (data) => {
         this.eclosionList = data;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Erreur récupération eclosion:', err);
+        this.cdr.detectChanges();
       }
     });
   }
 
   onEclosionCreated(): void {
-    this.message = 'Éclosion enregistrée avec succès !';
     this.loadEclosion();
-    setTimeout(() => {
-      this.message = '';
-    }, 3000);
   }
 }

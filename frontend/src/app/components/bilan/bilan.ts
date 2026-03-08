@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ChangeDetectorRef } from '@angular/core';
 import { Lots } from '../../models/lot.models';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LotsServices } from '../../services/lots-services';
@@ -22,7 +22,8 @@ export class Bilan {
   constructor(
     private fb: FormBuilder,
     private lotsService: LotsServices,
-    private bilanService: BilanService
+    private bilanService: BilanService,
+    private cdr: ChangeDetectorRef
   ) {
     this.bilanForm = this.fb.group({
       lot_id: [0, Validators.required],
@@ -32,8 +33,8 @@ export class Bilan {
 
   ngOnInit(): void {
     this.lotsService.getAllLots().subscribe({
-      next: (data : Lots[]) => this.lots = data,
-      error: (err: any) => console.error('Erreur récupération lots', err)
+      next: (data : Lots[]) => { this.lots = data; this.cdr.detectChanges(); },
+      error: (err: any) => { console.error('Erreur récupération lots', err); this.cdr.detectChanges(); }
     });
   }
 
@@ -54,6 +55,7 @@ export class Bilan {
         next: (data: BilanData) => {
           this.bilanData = data;
           this.isLoading = false;
+          this.cdr.detectChanges();
         },
         error: (err: any) => {
           console.error('Erreur récupération bilan', err);
@@ -77,6 +79,7 @@ export class Bilan {
           
           this.errorMessage = errorMsg;
           this.isLoading = false;
+          this.cdr.detectChanges();
         }
       });
     } else {

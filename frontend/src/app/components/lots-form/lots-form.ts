@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RaceService } from '../../services/race.services';
@@ -22,7 +22,8 @@ export class LotsForm implements OnInit {
   constructor(
     private fb: FormBuilder,
     private raceService: RaceService,
-    private lotService: LotsServices // ← correspond à ton service
+    private lotService: LotsServices, // ← correspond à ton service
+    private cdr: ChangeDetectorRef
   ) {
     this.lotsForm = this.fb.group({
       name: ['', Validators.required],
@@ -36,8 +37,8 @@ export class LotsForm implements OnInit {
 
   ngOnInit(): void {
     this.raceService.getAllRaces().subscribe({
-      next: (data: Race[]) => this.races = data,
-      error: (err: any) => console.error('Erreur récupération races', err)
+      next: (data: Race[]) => { this.races = data; this.cdr.detectChanges(); },
+      error: (err: any) => { console.error('Erreur récupération races', err); this.cdr.detectChanges(); }
     });
   }
 
@@ -55,9 +56,10 @@ export class LotsForm implements OnInit {
             age: 0,
             prix_achat: 0
           });
-          this.lotCreated.emit(); // Émettre l'événement
+          this.lotCreated.emit();
+          this.cdr.detectChanges();
         },
-        error: (err: any) => console.error('Erreur création lot:', err)
+        error: (err: any) => { console.error('Erreur création lot:', err); this.cdr.detectChanges(); }
       });
     } else {
       console.log('Formulaire invalide !');

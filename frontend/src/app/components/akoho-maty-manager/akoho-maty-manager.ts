@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { AkohoMaty } from '../../models/akoho-maty.model';
 import { AkohoMatyService } from '../../services/akoho-maty.service';
 import { CommonModule } from '@angular/common';
@@ -14,7 +14,7 @@ export class AkohoMatyManager implements OnInit {
   akohoMatyList: AkohoMaty[] = [];
   message = '';
 
-  constructor(private akohoMatyService: AkohoMatyService) { }
+  constructor(private akohoMatyService: AkohoMatyService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.loadAkohoMaty();
@@ -24,18 +24,16 @@ export class AkohoMatyManager implements OnInit {
     this.akohoMatyService.getAll().subscribe({
       next: (data) => {
         this.akohoMatyList = data;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Erreur récupération akoho maty:', err);
+        this.cdr.detectChanges();
       }
     });
   }
 
   onAkohoMatyCreated(): void {
-    this.message = 'Mortalité enregistrée avec succès !';
     this.loadAkohoMaty();
-    setTimeout(() => {
-      this.message = '';
-    }, 3000);
   }
 }

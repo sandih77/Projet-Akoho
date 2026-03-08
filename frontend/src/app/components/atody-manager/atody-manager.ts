@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Atody } from '../../models/atody.model';
 import { AtodyService } from '../../services/atody.service';
 import { CommonModule } from '@angular/common';
@@ -14,7 +14,7 @@ export class AtodyManager implements OnInit {
   atodyList: Atody[] = [];
   message = '';
 
-  constructor(private atodyService: AtodyService) { }
+  constructor(private atodyService: AtodyService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.loadAtody();
@@ -24,18 +24,16 @@ export class AtodyManager implements OnInit {
     this.atodyService.getAll().subscribe({
       next: (data) => {
         this.atodyList = data;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Erreur récupération atody:', err);
+        this.cdr.detectChanges();
       }
     });
   }
 
   onAtodyCreated(): void {
-    this.message = 'Production d\'œufs enregistrée avec succès !';
     this.loadAtody();
-    setTimeout(() => {
-      this.message = '';
-    }, 3000);
   }
 }

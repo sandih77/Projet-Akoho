@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Configuration } from '../../models/configuration.model';
 import { ConfigurationService } from '../../services/configuration.service';
@@ -16,7 +16,7 @@ export class ConfigurationManager implements OnInit {
     message = '';
     deletingId: number | null = null;
 
-    constructor(private configService: ConfigurationService) { }
+    constructor(private configService: ConfigurationService, private cdr: ChangeDetectorRef) { }
 
     ngOnInit(): void {
         this.loadConfigurations();
@@ -24,15 +24,19 @@ export class ConfigurationManager implements OnInit {
 
     loadConfigurations(): void {
         this.configService.getAll().subscribe({
-            next: (data) => this.configurations = data,
-            error: (err) => console.error('Erreur récupération configurations:', err),
+            next: (data) => {
+                this.configurations = data;
+                this.cdr.detectChanges();
+            },
+            error: (err) => {
+                console.error('Erreur récupération configurations:', err);
+                this.cdr.detectChanges();
+            },
         });
     }
 
     onConfigurationCreated(): void {
-        this.message = 'Configuration enregistrée avec succès !';
         this.loadConfigurations();
-        setTimeout(() => this.message = '', 3000);
     }
 
     deleteConfiguration(id: number): void {
@@ -43,11 +47,13 @@ export class ConfigurationManager implements OnInit {
                 this.message = 'Configuration supprimée.';
                 this.loadConfigurations();
                 this.deletingId = null;
-                setTimeout(() => this.message = '', 3000);
+                this.cdr.detectChanges();
+                setTimeout(() => { this.message = ''; this.cdr.detectChanges(); }, 3000);
             },
             error: (err) => {
                 console.error('Erreur suppression:', err);
                 this.deletingId = null;
+                this.cdr.detectChanges();
             },
         });
     }

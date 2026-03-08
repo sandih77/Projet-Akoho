@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Lots } from '../../models/lot.models';
 import { LotsServices } from '../../services/lots-services';
 import { CommonModule } from '@angular/common';
@@ -14,7 +14,7 @@ export class LotsManager implements OnInit {
     lots: Lots[] = [];
     message = '';
 
-    constructor(private lotsService: LotsServices) { }
+    constructor(private lotsService: LotsServices, private cdr: ChangeDetectorRef) { }
 
     ngOnInit(): void {
         this.loadLots();
@@ -24,9 +24,11 @@ export class LotsManager implements OnInit {
         this.lotsService.getAllLots().subscribe({
             next: (data) => {
                 this.lots = data;
+                this.cdr.detectChanges();
             },
             error: (err) => {
                 console.error('Erreur récupération lots:', err);
+                this.cdr.detectChanges();
             }
         });
     }
@@ -36,6 +38,7 @@ export class LotsManager implements OnInit {
         this.loadLots();
         setTimeout(() => {
             this.message = '';
+            this.cdr.detectChanges();
         }, 3000);
     }
 }

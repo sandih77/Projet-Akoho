@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { LotsServices } from '../../services/lots-services';
@@ -24,7 +24,8 @@ export class ConfigurationForm implements OnInit {
     constructor(
         private fb: FormBuilder,
         private lotsService: LotsServices,
-        private configService: ConfigurationService
+        private configService: ConfigurationService,
+        private cdr: ChangeDetectorRef
     ) {
         this.configForm = this.fb.group({
             lot_id: [0, Validators.required],
@@ -36,8 +37,8 @@ export class ConfigurationForm implements OnInit {
 
     ngOnInit(): void {
         this.lotsService.getAllLots().subscribe({
-            next: (data: Lots[]) => this.lots = data,
-            error: (err: any) => console.error('Erreur récupération lots', err),
+            next: (data: Lots[]) => { this.lots = data; this.cdr.detectChanges(); },
+            error: (err: any) => { console.error('Erreur récupération lots', err); this.cdr.detectChanges(); },
         });
     }
 
@@ -51,7 +52,8 @@ export class ConfigurationForm implements OnInit {
                     this.successMessage = 'Configuration enregistrée avec succès !';
                     this.configForm.reset({ lot_id: 0, semaine: 0, variation_poids: 0, sakafo_semaine: 0 });
                     this.configurationCreated.emit();
-                    setTimeout(() => this.successMessage = '', 3000);
+                    this.cdr.detectChanges();
+                    setTimeout(() => { this.successMessage = ''; this.cdr.detectChanges(); }, 3000);
                 },
                 error: (err: any) => {
                     this.errorMessage =
@@ -60,6 +62,7 @@ export class ConfigurationForm implements OnInit {
                         err?.error?.message ||
                         err?.message ||
                         'Une erreur est survenue.';
+                    this.cdr.detectChanges();
                 },
             });
         }

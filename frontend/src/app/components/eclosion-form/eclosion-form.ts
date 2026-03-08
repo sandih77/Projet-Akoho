@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { LotsServices } from '../../services/lots-services';
@@ -24,7 +24,8 @@ export class EclosionForm implements OnInit {
   constructor(
     private fb: FormBuilder,
     private lotsService: LotsServices,
-    private eclosionService: EclosionService
+    private eclosionService: EclosionService,
+    private cdr: ChangeDetectorRef
   ) {
     this.eclosionForm = this.fb.group({
       lot_id: [0, Validators.required],
@@ -36,8 +37,8 @@ export class EclosionForm implements OnInit {
 
   ngOnInit(): void {
     this.lotsService.getAllLots().subscribe({
-      next: (data: Lots[]) => this.lots = data,
-      error: (err: any) => console.error('Erreur récupération lots', err)
+      next: (data: Lots[]) => { this.lots = data; this.cdr.detectChanges(); },
+      error: (err: any) => { console.error('Erreur récupération lots', err); this.cdr.detectChanges(); }
     });
   }
 
@@ -57,10 +58,12 @@ export class EclosionForm implements OnInit {
             nombre_tsy_foy: 0
           });
           this.eclosionCreated.emit();
+          this.cdr.detectChanges();
 
           // Effacer le message de succès après 3 secondes
           setTimeout(() => {
             this.successMessage = '';
+            this.cdr.detectChanges();
           }, 3000);
         },
         error: (err: any) => {
@@ -84,6 +87,7 @@ export class EclosionForm implements OnInit {
           } else {
             this.errorMessage = 'Erreur lors de la création de l\'eclosion.';
           }
+          this.cdr.detectChanges();
         }
       });
     } else {
