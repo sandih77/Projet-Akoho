@@ -9,6 +9,7 @@ import { Bilan } from './components/bilan/bilan';
 import { ConfigurationManager } from './components/configuration-manager/configuration-manager';
 
 export const routes: Routes = [
+    { path: '', component: RacesManager }, 
     { path: 'race-manager', component: RacesManager },
     { path: 'lots-manager', component: LotsManager },
     { path: 'lots-form', component: LotsForm },

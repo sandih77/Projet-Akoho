@@ -66,6 +66,10 @@
   overflow-x: auto;
 }
 
+.bilan-table-head {
+  text-align: center;
+}
+
 .bilan-table {
   width: 100%;
   border-collapse: collapse;
@@ -118,7 +122,6 @@
 }
 
 .td-money {
-  text-align: right;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }

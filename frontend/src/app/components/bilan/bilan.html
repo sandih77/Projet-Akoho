@@ -38,14 +38,6 @@
         <tr>
           <th>Nom du lot</th>
           <th>Race</th>
-          <th>Akoho vivants</th>
-          <th>Akoho morts</th>
-          <th>Œufs produits</th>
-          <th>Poids moyen (g)</th>
-          <th>PV total akoho</th>
-          <th>Revenus œufs</th>
-          <th>Coût sakafo</th>
-          <th>Coût achat lot</th>
           <th>Dépenses totales</th>
           <th>Revenus totaux</th>
           <th>Bénéfices</th>
@@ -56,14 +48,6 @@
         <tr *ngFor="let b of bilans">
           <td class="td-name">{{ b.lot_name }}</td>
           <td>{{ b.race_nom }}</td>
-          <td class="td-num text-success">{{ b.nombre_akoho_vivants }}</td>
-          <td class="td-num text-danger">{{ b.nombre_akoho_maty }}</td>
-          <td class="td-num">{{ b.nombre_atody }}</td>
-          <td class="td-num">{{ b.poids_moyen | number:'1.2-2' }}</td>
-          <td class="td-money">{{ b.pv_total_akoho | number:'1.0-0' }} Ar</td>
-          <td class="td-money">{{ b.cout_total_atody | number:'1.0-0' }} Ar</td>
-          <td class="td-money text-danger">{{ b.sakafo_cout | number:'1.0-0' }} Ar</td>
-          <td class="td-money text-danger">{{ b.cout_achat | number:'1.0-0' }} Ar</td>
           <td class="td-money text-danger">{{ b.depenses_totales | number:'1.0-0' }} Ar</td>
           <td class="td-money text-success">{{ b.revenus_totaux | number:'1.0-0' }} Ar</td>
           <td class="td-money td-benefice" [class.profit]="b.benefices >= 0" [class.loss]="b.benefices < 0">

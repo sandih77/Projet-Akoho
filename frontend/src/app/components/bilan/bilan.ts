@@ -54,9 +54,11 @@ export class Bilan {
 
   voirDetails(bilan: BilanData): void {
     this.selectedBilan = bilan;
+    this.cdr.detectChanges();
   }
 
   retourTableau(): void {
     this.selectedBilan = null;
+    this.cdr.detectChanges();
   }
 }
