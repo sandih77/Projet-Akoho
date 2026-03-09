@@ -1,6 +1,7 @@
 import LotModel from "./LotModel.js";
 import AkohoMatyModel from "./AkohoMatyModel.js";
 import AtodyModel from "./AtodyModel.js";
+import RaceModel from "./RaceModel.js";
 
 export default class BilanModel {
 
@@ -115,7 +116,7 @@ export default class BilanModel {
             const duree = this.calculateDuree(lotInfo.date_achat, dateBilan);
 
             // 3. Récupérer toutes les configurations du lot
-            const configurations = await LotModel.getConfigurationsByLot(lotId);
+            const configurations = await RaceModel.getConfigurationsByRace(lotInfo.race_id);
 
             // 4. Calculer sakafo et poids avec gestion de la semaine partielle
             const sakafoResult = this.calculateSakafoAndPoids(
@@ -152,5 +153,29 @@ export default class BilanModel {
             console.error('Erreur récupération bilan:', err);
             throw err;
         }
+    }
+
+    // Retourne le bilan de tous les lots pour une date donnée
+    static async getAllBilans(dateBilan) {
+        const lots = await LotModel.getAll();
+        const results = [];
+        for (const lot of lots) {
+            try {
+                const dateAchat = new Date(lot.date_achat);
+                const dateBilanDate = new Date(dateBilan);
+                dateAchat.setHours(0, 0, 0, 0);
+                dateBilanDate.setHours(0, 0, 0, 0);
+                if (dateBilanDate < dateAchat) {
+                    // Lot pas encore acheté à cette date — ignorer
+                    continue;
+                }
+                const bilan = await this.getBilanByLotAndDate(lot.id, dateBilan);
+                if (bilan) results.push(bilan);
+            } catch (err) {
+                // Ignorer les lots qui génèrent une erreur (ex: pas de config)
+                console.warn(`Bilan ignoré pour lot ${lot.id}: ${err.message}`);
+            }
+        }
+        return results;
     }
 }

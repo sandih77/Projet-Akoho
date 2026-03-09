@@ -1,7 +1,7 @@
 export interface Configuration {
     id?: number;
-    lot_id: number;
-    lot_nom?: string;
+    race_id: number;
+    race_nom?: string;
     semaine: number;
     variation_poids: number;
     sakafo_semaine: number;

@@ -37,4 +37,8 @@ export class BilanService {
     getBilanByLotAndDate(lotId: number, dateBilan: string): Observable<BilanData> {
         return this.http.get<BilanData>(`${this.apiUrl}?lot_id=${lotId}&date_bilan=${dateBilan}`);
     }
+
+    getAllBilans(dateBilan: string): Observable<BilanData[]> {
+        return this.http.get<BilanData[]>(`${this.apiUrl}/all?date_bilan=${dateBilan}`);
+    }
 }

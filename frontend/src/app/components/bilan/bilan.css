@@ -9,7 +9,7 @@
 
 .query-form {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: 1fr auto;
   gap: 16px;
   align-items: end;
 }
@@ -23,6 +23,122 @@
 .query-btn {
   min-width: 190px;
   justify-content: center;
+}
+
+/* ── Retour button ───────────────────────────────────────── */
+.retour-btn {
+  margin-bottom: 20px;
+}
+
+/* ── Table wrapper ───────────────────────────────────────── */
+.table-wrapper {
+  padding: 0;
+  overflow: hidden;
+}
+
+.table-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.table-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lot-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--primary-light);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.bilan-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.bilan-table thead tr {
+  background: var(--primary-light);
+}
+
+.bilan-table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  border-bottom: 2px solid var(--border);
+}
+
+.bilan-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.bilan-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.bilan-table tbody tr:hover {
+  background: var(--bg-hover, rgba(0, 0, 0, 0.02));
+}
+
+.bilan-table td {
+  padding: 10px 14px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.td-name {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.td-num {
+  text-align: right;
+  font-weight: 600;
+}
+
+.td-money {
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.td-benefice {
+  font-weight: 800;
+}
+
+.td-benefice.profit {
+  color: var(--success);
+}
+
+.td-benefice.loss {
+  color: var(--danger);
+}
+
+.btn-sm {
+  padding: 5px 12px;
+  font-size: 12px;
+  gap: 5px;
 }
 
 /* Banner */

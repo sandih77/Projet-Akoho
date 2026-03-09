@@ -33,4 +33,25 @@ export default class RaceModel {
             throw err;
         }
     }
+
+    static async getConfigurationsByRace(race_id) {
+        try {
+            const pool = await Database.getPool();
+            const request = pool.request();
+
+            request.input('race_id', Database.getSql().Int, race_id);
+
+            const result = await request.query(`
+                SELECT semaine, variation_poids, sakafo_semaine
+                FROM Configuration
+                WHERE race_id = @race_id
+                ORDER BY semaine ASC
+            `);
+
+            return result.recordset;
+        } catch (err) {
+            console.error('Erreur récupération configurations:', err);
+            throw err;
+        }
+    }
 }

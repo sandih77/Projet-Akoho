@@ -4,10 +4,10 @@
 <form [formGroup]="configForm" (ngSubmit)="onSubmit()">
 
     <div class="form-group">
-        <label class="form-label" for="lot_id">Lot</label>
-        <select class="form-control" id="lot_id" formControlName="lot_id">
-            <option [value]="0" disabled>Choisir un lot</option>
-            <option *ngFor="let lot of lots" [value]="lot.id">{{ lot.name }} ({{ lot.race_nom }})</option>
+        <label class="form-label" for="race_id">Race</label>
+        <select class="form-control" id="race_id" formControlName="race_id">
+            <option [value]="0" disabled>Choisir une race</option>
+            <option *ngFor="let race of races" [value]="race.id">{{ race.nom }}</option>
         </select>
     </div>
 

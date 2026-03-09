@@ -59,13 +59,13 @@ export class ConfigurationManager implements OnInit {
     }
 
     /** Group configurations by lot name for display */
-    get groupedByLot(): { lot_nom: string; rows: Configuration[] }[] {
+    get groupedByLot(): { race_nom: string; rows: Configuration[] }[] {
         const map = new Map<string, Configuration[]>();
         for (const c of this.configurations) {
-            const key = c.lot_nom ?? `Lot ${c.lot_id}`;
+            const key = c.race_nom ?? `Lot ${c.race_id}`;
             if (!map.has(key)) map.set(key, []);
             map.get(key)!.push(c);
         }
-        return Array.from(map.entries()).map(([lot_nom, rows]) => ({ lot_nom, rows }));
+        return Array.from(map.entries()).map(([race_nom, rows]) => ({ race_nom, rows }));
     }
 }

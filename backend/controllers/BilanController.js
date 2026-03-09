@@ -1,6 +1,19 @@
 import BilanModel from "../models/BilanModel.js";
 
 export default class BilanController {
+    static async getAllBilans(req, res) {
+        try {
+            const { date_bilan } = req.query;
+            if (!date_bilan) {
+                return res.status(400).json({ error: 'Paramètre manquant', details: 'date_bilan est requis' });
+            }
+            const bilans = await BilanModel.getAllBilans(date_bilan);
+            res.status(200).json(bilans);
+        } catch (err) {
+            res.status(500).json({ error: 'Erreur serveur', details: err.message });
+        }
+    }
+
     static async getBilanByLotAndDate(req, res) {
         try {
             const { lot_id, date_bilan } = req.query;

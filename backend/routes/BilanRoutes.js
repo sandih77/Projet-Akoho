@@ -8,6 +8,7 @@ export default class BilanRoutes {
   }
 
   initRoutes() {
+    this.router.get("/all", BilanController.getAllBilans);
     this.router.get("/", BilanController.getBilanByLotAndDate);
   }
 

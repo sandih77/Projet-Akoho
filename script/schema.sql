@@ -9,7 +9,7 @@ CREATE TABLE Race (id INT IDENTITY(1, 1) PRIMARY KEY,nom VARCHAR(100) NOT NULL,p
 
 CREATE TABLE Lot (id INT IDENTITY(1, 1) PRIMARY KEY,name VARCHAR(100) NOT NULL,race_id INT NOT NULL,date_achat DATE NOT NULL,nombre_akoho INT NOT NULL,age INT,prix_achat DECIMAL(10, 2),CONSTRAINT FK_Lot_Race FOREIGN KEY (race_id) REFERENCES Race(id));
 
-CREATE TABLE Configuration (id INT IDENTITY(1, 1) PRIMARY KEY,lot_id INT NOT NULL,semaine INT NOT NULL,variation_poids DECIMAL(10, 2),sakafo_semaine DECIMAL(10, 2),CONSTRAINT FK_Config_Lot FOREIGN KEY (lot_id) REFERENCES Lot(id));
+CREATE TABLE Configuration (id INT IDENTITY(1, 1) PRIMARY KEY,race_id INT NOT NULL,semaine INT NOT NULL,variation_poids DECIMAL(10, 2),sakafo_semaine DECIMAL(10, 2),CONSTRAINT FK_Config_Race FOREIGN KEY (race_id) REFERENCES Race(id));
 
 CREATE TABLE Atody (id INT IDENTITY(1, 1) PRIMARY KEY,lot_id INT NOT NULL,date_production DATE NOT NULL,nombre_atody INT NOT NULL,CONSTRAINT FK_Atody_Lot FOREIGN KEY (lot_id) REFERENCES Lot(id));
 

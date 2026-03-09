@@ -66,6 +66,7 @@ export default class LotModel {
                     L.prix_achat AS cout_achat,
                     L.age AS age_initial,
                     L.date_achat,
+                    R.id AS race_id,
                     R.nom AS race_nom,
                     R.pu_sakafo_par_gramme,
                     R.pv_par_gramme,
@@ -78,27 +79,6 @@ export default class LotModel {
             return result.recordset[0] || null;
         } catch (err) {
             console.error('Erreur récupération lot avec race info:', err);
-            throw err;
-        }
-    }
-
-    static async getConfigurationsByLot(lotId) {
-        try {
-            const pool = await Database.getPool();
-            const request = pool.request();
-
-            request.input('lot_id', Database.getSql().Int, lotId);
-
-            const result = await request.query(`
-                SELECT semaine, variation_poids, sakafo_semaine
-                FROM Configuration
-                WHERE lot_id = @lot_id
-                ORDER BY semaine ASC
-            `);
-
-            return result.recordset;
-        } catch (err) {
-            console.error('Erreur récupération configurations:', err);
             throw err;
         }
     }
