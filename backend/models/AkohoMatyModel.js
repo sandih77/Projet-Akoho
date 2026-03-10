@@ -109,4 +109,31 @@ export default class AkohoMatyModel {
             throw err;
         }
     }
+
+    /**
+     * Retourne la liste des morts classée par date (du lot, jusqu'à date_bilan).
+     * Chaque ligne : { date_maty: Date, nombre: number }
+     */
+    static async getDeathsByLotAndDate(lotId, dateBilan) {
+        try {
+            const pool = await Database.getPool();
+            const request = pool.request();
+
+            request.input('lot_id', Database.getSql().Int, lotId);
+            request.input('date_bilan', Database.getSql().Date, dateBilan);
+
+            const result = await request.query(`
+                SELECT date_maty, SUM(nombre) AS nombre
+                FROM Akoho_Maty
+                WHERE lot_id = @lot_id AND date_maty <= @date_bilan
+                GROUP BY date_maty
+                ORDER BY date_maty ASC
+            `);
+
+            return result.recordset; // [{ date_maty, nombre }, ...]
+        } catch (err) {
+            console.error('Erreur récupération historique morts:', err);
+            throw err;
+        }
+    }
 }

@@ -22,6 +22,7 @@
             <th>Lot mère</th>
             <th>Date d'éclosion</th>
             <th>Poussins éclos</th>
+            <th>Atody tsy foy</th>
           </tr>
         </thead>
         <tbody>
@@ -30,6 +31,7 @@
             <td>{{ eclosion.lot_nom }}</td>
             <td>{{ eclosion.date_eclosion | date:'dd/MM/yyyy' }}</td>
             <td><span class="badge badge-warning">{{ eclosion.nombre_foy }} poussins</span></td>
+            <td><span class="badge badge-warning">{{ eclosion.nombre_tsy_foy }} </span></td>
           </tr>
         </tbody>
       </table>

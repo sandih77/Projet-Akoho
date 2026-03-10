@@ -83,11 +83,13 @@ export default class EclosionModel {
             `);
 
             const nouveauLotId = lotResult.recordset[0].nouveau_lot_id;
+            const nombre_tsy_foy = totalAtody - eclosionData.nombre_foy;
+            request.input('nombre_tsy_foy', Database.getSql().Int, nombre_tsy_foy);
 
             // Insérer l'éclosion
             const result = await request.query(
-                `INSERT INTO Eclosion (lot_id, date_eclosion, nombre_foy)
-                 VALUES (@lot_id, @date_eclosion, @nombre_foy);
+                `INSERT INTO Eclosion (lot_id, date_eclosion, nombre_foy, nombre_tsy_foy)
+                 VALUES (@lot_id, @date_eclosion, @nombre_foy, @nombre_tsy_foy);
                  SELECT SCOPE_IDENTITY() AS id;`
             );
 
@@ -95,7 +97,7 @@ export default class EclosionModel {
             const atodyRequest = pool.request();
             atodyRequest.input('lot_id', Database.getSql().Int, eclosionData.lot_id);
             atodyRequest.input('date_production', Database.getSql().Date, eclosionData.date_eclosion);
-            atodyRequest.input('nombre_atody', Database.getSql().Int, -eclosionData.nombre_foy);
+            atodyRequest.input('nombre_atody', Database.getSql().Int, -totalAtody);
 
             await atodyRequest.query(
                 `INSERT INTO Atody (lot_id, date_production, nombre_atody)
@@ -129,7 +131,8 @@ export default class EclosionModel {
                     Eclosion.lot_id, 
                     Lot.name as lot_nom,
                     Eclosion.date_eclosion, 
-                    Eclosion.nombre_foy
+                    Eclosion.nombre_foy,
+                    Eclosion.nombre_tsy_foy
                 FROM Eclosion
                 INNER JOIN Lot ON Eclosion.lot_id = Lot.id
                 ORDER BY Eclosion.date_eclosion DESC

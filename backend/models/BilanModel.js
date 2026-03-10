@@ -11,58 +11,123 @@ export default class BilanModel {
      * - Semaine 1 : jours 7-13, etc.
      * Retourne { semaines, jours, totalJours }
      */
-    static calculateDuree(dateAchat, dateBilan) {
+    static calculateDuree(dateAchat, dateBilan, ageInitial) {
         const d1 = new Date(dateAchat);
         const d2 = new Date(dateBilan);
         // Ignorer l'heure pour comparer seulement les dates
         d1.setHours(0, 0, 0, 0);
         d2.setHours(0, 0, 0, 0);
-        const totalJours = Math.floor((d2 - d1) / (1000 * 60 * 60 * 24));
+        const totalJours = (Math.floor((d2 - d1) / (1000 * 60 * 60 * 24))) + 1 + (ageInitial * 7);
         const semaines = Math.floor(totalJours / 7);
         const jours = totalJours % 7;
         return { semaines, jours, totalJours };
     }
 
     /**
-     * Calcule le sakafo total et la variation de poids totale en tenant compte
-     * des semaines complètes et de la semaine partielle (pro-rata sur les jours restants).
-     * configurations : tableau trié par semaine (0, 1, 2, ...)
-     * semaines       : nombre de semaines complètes écoulées
-     * jours          : jours restants dans la semaine courante (0..6)
+     * Calcule la variation de poids totale (par akoho) sur la période.
+     * Utilisé pour le poids_moyen des akoho vivants.
      */
-    static calculateSakafoAndPoids(configurations, semaines, jours) {
-        let total_sakafo = 0;
+    static calculatePoids(configurations, semaines, jours, ageInitial) {
+
+        // 1️⃣ Poids initial = somme des variations jusqu'à ageInitial inclus
+        let poidsInitial = 0;
+        for (const config of configurations) {
+            if (config.semaine <= ageInitial) {
+                poidsInitial += config.variation_poids || 0;
+            }
+        }
+
+        // 2️⃣ Somme des variations après l’âge initial
         let total_variation = 0;
+        const startWeek = ageInitial + 1;
+        const endWeek = ageInitial + semaines;
 
         for (const config of configurations) {
-            if (config.semaine === 0) {
-                // Semaine 0 = poids initial uniquement, jamais de sakafo
+            // semaines complètes après ageInitial
+            if (config.semaine >= startWeek && config.semaine <= endWeek) {
                 total_variation += config.variation_poids || 0;
+            }
 
-            } else if (config.semaine <= semaines) {
-                // Semaine complète (semaine N≥1 est complète si N semaines se sont écoulées)
-                total_sakafo += config.sakafo_semaine || 0;
-                total_variation += config.variation_poids || 0;
-
-            } else if (config.semaine === semaines + 1 && jours > 0) {
-                // Semaine en cours (partielle) : pro-rata jours/7
-                total_sakafo += (config.sakafo_semaine || 0) * (jours / 7);
+            // semaine partielle
+            if (config.semaine === endWeek + 1 && jours > 0) {
                 total_variation += (config.variation_poids || 0) * (jours / 7);
             }
         }
 
-        return { total_sakafo, total_variation };
+        // 3️⃣ Poids final
+        return poidsInitial + total_variation;
+    }
+
+    /**
+     * Calcule le sakafo total (en grammes) consommé sur toute la période,
+     * en tenant compte des morts au jour le jour.
+     *
+     * Pour chaque jour d (de 1 à totalJours) :
+     *   - alive(d) = nombre_initial - morts dont la date est STRICTEMENT avant ce jour
+     *     (les akoho morts le jour J mangent encore le jour J)
+     *   - semaine applicable = ceil(d / 7)  → semaine 1 = jours 1-7, sem.2 = 8-14 …
+     *   - sakafo_jour = (sakafo_semaine / 7) * alive(d)
+     *
+     * @param {Array}  configurations  - triées par semaine ASC
+     * @param {number} nombreInitial   - nombre d'akoho au départ
+     * @param {string} dateAchat       - date ISO du lot
+     * @param {number} totalJours      - nb de jours entre achat et bilan
+     * @param {Array}  deaths          - [{ date_maty: Date|string, nombre }] triées ASC
+     */
+    static calculateSakafoWithDeaths(configurations, nombreInitial, dateAchat, totalJours, deaths, ageInitial) {
+        // Construire un map date (ms) → cumul morts jusqu'à cette date
+        // On pré-calcule la liste triée des événements de mort
+        const deathEvents = deaths.map(d => ({
+            ms: new Date(d.date_maty).setHours(0, 0, 0, 0),
+            nombre: Number(d.nombre)
+        }));
+
+        // Construire un map config par numéro de semaine
+        const configMap = {};
+        for (const c of configurations) {
+            configMap[c.semaine] = c;
+        }
+
+        const baseDate = new Date(dateAchat);
+        baseDate.setHours(0, 0, 0, 0);
+
+        let totalSakafo = 0;
+        let cumMorts = 0;        // morts dont la date < jour courant
+        let deathIdx = 0;        // pointeur dans deathEvents
+
+        for (let d = 1; d <= totalJours; d++) {
+            // Date du jour courant
+            const dayMs = baseDate.getTime() + d * 24 * 60 * 60 * 1000;
+
+            // Avancer le curseur des morts : compter ceux dont date_maty < dayMs
+            // (les akoho morts LE jour courant mangent encore ce jour-là)
+            while (deathIdx < deathEvents.length && deathEvents[deathIdx].ms < dayMs) {
+                cumMorts += deathEvents[deathIdx].nombre;
+                deathIdx++;
+            }
+
+            const alive = Math.max(0, nombreInitial - cumMorts);
+
+            // Numéro de semaine de configuration applicable
+            const semaineNum = ageInitial + Math.ceil(d / 7);
+            const config = configMap[semaineNum];
+            if (!config) continue; // pas de config pour cette semaine → on ignore
+
+
+            const sakafoJour = (config.sakafo_semaine / 7) * alive;
+            // console.log(`Jour ${d}: alive=${alive}, config_semaine=${semaineNum}, sakafo_jour=${sakafoJour}g`,);
+            totalSakafo += sakafoJour;
+        }
+
+        return totalSakafo; // grammes totaux consommés
     }
 
     // Calculer les statistiques financières
-    static calculateFinances(lotInfo, sakafoResult, totalAkohoMaty, totalAtody) {
+    static calculateFinances(lotInfo, totalSakafoGrammes, poidsMoyen, totalAkohoMaty, totalAtody) {
         const nombreAkohoVivants = lotInfo.nombre_initial_akoho - totalAkohoMaty;
 
-        // Coût du sakafo
-        const sakafoCout = sakafoResult.total_sakafo * lotInfo.pu_sakafo_par_gramme;
-
-        // Poids moyen = somme des variations de poids (poids total accumulé par akoho)
-        const poidsMoyen = sakafoResult.total_variation;
+        // Coût du sakafo = grammes réels consommés × prix au gramme
+        const sakafoCout = totalSakafoGrammes * lotInfo.pu_sakafo_par_gramme;
 
         // Prix de vente total des akoho vivants
         const pvTotalAkoho = nombreAkohoVivants * poidsMoyen * lotInfo.pv_par_gramme;
@@ -77,7 +142,7 @@ export default class BilanModel {
 
         return {
             nombre_akoho_vivants: nombreAkohoVivants,
-            sakafo_poids: sakafoResult.total_sakafo,
+            sakafo_poids: totalSakafoGrammes,
             sakafo_cout: sakafoCout,
             poids_moyen: poidsMoyen,
             pv_total_akoho: pvTotalAkoho,
@@ -113,26 +178,35 @@ export default class BilanModel {
             }
 
             // 2. Calculer la durée exacte (semaines complètes + jours restants)
-            const duree = this.calculateDuree(lotInfo.date_achat, dateBilan);
+            const duree = this.calculateDuree(lotInfo.date_achat, dateBilan, lotInfo.age_initial);
 
             // 3. Récupérer toutes les configurations du lot
             const configurations = await RaceModel.getConfigurationsByRace(lotInfo.race_id);
 
-            // 4. Calculer sakafo et poids avec gestion de la semaine partielle
-            const sakafoResult = this.calculateSakafoAndPoids(
+            // 4. Calculer le poids moyen (par akoho vivant)
+            const poidsMoyen = this.calculatePoids(configurations, duree.semaines, duree.jours, lotInfo.age_initial);
+
+            // 5. Récupérer le nombre d'akoho maty (total) et l'historique par date
+            const [totalAkohoMaty, deaths] = await Promise.all([
+                AkohoMatyModel.getTotalByLotAndDate(lotId, dateBilan),
+                AkohoMatyModel.getDeathsByLotAndDate(lotId, dateBilan)
+            ]);
+
+            // 6. Calculer le sakafo réel (jour par jour, tenant compte des morts)
+            const totalSakafoGrammes = this.calculateSakafoWithDeaths(
                 configurations,
-                duree.semaines,
-                duree.jours
+                lotInfo.nombre_initial_akoho,
+                lotInfo.date_achat,
+                duree.totalJours,
+                deaths,
+                lotInfo.age_initial
             );
 
-            // 5. Récupérer le nombre d'akoho maty
-            const totalAkohoMaty = await AkohoMatyModel.getTotalByLotAndDate(lotId, dateBilan);
-
-            // 6. Récupérer le nombre d'atody
+            // 7. Récupérer le nombre d'atody
             const totalAtody = await AtodyModel.getTotalByLotAndDate(lotId, dateBilan);
 
-            // 7. Calculer les finances
-            const finances = this.calculateFinances(lotInfo, sakafoResult, totalAkohoMaty, totalAtody);
+            // 8. Calculer les finances
+            const finances = this.calculateFinances(lotInfo, totalSakafoGrammes, poidsMoyen, totalAkohoMaty, totalAtody);
 
             // 8. Construire le bilan complet
             return {
