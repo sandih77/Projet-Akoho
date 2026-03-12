@@ -11,51 +11,48 @@ export default class BilanModel {
      * - Semaine 1 : jours 7-13, etc.
      * Retourne { semaines, jours, totalJours }
      */
-    static calculateDuree(dateAchat, dateBilan, ageInitial) {
+    static calculateDuree(dateAchat, dateBilan) {
         const d1 = new Date(dateAchat);
         const d2 = new Date(dateBilan);
         // Ignorer l'heure pour comparer seulement les dates
         d1.setHours(0, 0, 0, 0);
         d2.setHours(0, 0, 0, 0);
-        const totalJours = (Math.floor((d2 - d1) / (1000 * 60 * 60 * 24))) + 1 + (ageInitial * 7);
+        const totalJours = (Math.floor((d2 - d1) / (1000 * 60 * 60 * 24))) + 1;
         const semaines = Math.floor(totalJours / 7);
         const jours = totalJours % 7;
         return { semaines, jours, totalJours };
     }
 
-    /**
-     * Calcule la variation de poids totale (par akoho) sur la période.
-     * Utilisé pour le poids_moyen des akoho vivants.
-     */
-    static calculatePoids(configurations, semaines, jours, ageInitial) {
+    static calculatePoids(configurations, semaines, jours, ageInitial, poidsInitialLot) {
+        const hasPoidsInitial = poidsInitialLot != null && Number(poidsInitialLot) > 0;
 
-        // 1️⃣ Poids initial = somme des variations jusqu'à ageInitial inclus
-        let poidsInitial = 0;
-        for (const config of configurations) {
-            if (config.semaine <= ageInitial) {
-                poidsInitial += config.variation_poids || 0;
+        let baseWeight;
+        if (hasPoidsInitial) {
+            baseWeight = Number(poidsInitialLot);
+        } else {
+            baseWeight = 0;
+            for (const config of configurations) {
+                if (config.semaine <= ageInitial) {
+                    baseWeight += config.variation_poids || 0;
+                }
             }
         }
 
-        // 2️⃣ Somme des variations après l’âge initial
+        // Variations après l'âge initial (commun aux deux cas)
         let total_variation = 0;
         const startWeek = ageInitial + 1;
         const endWeek = ageInitial + semaines;
 
         for (const config of configurations) {
-            // semaines complètes après ageInitial
             if (config.semaine >= startWeek && config.semaine <= endWeek) {
                 total_variation += config.variation_poids || 0;
             }
-
-            // semaine partielle
             if (config.semaine === endWeek + 1 && jours > 0) {
                 total_variation += (config.variation_poids || 0) * (jours / 7);
             }
         }
 
-        // 3️⃣ Poids final
-        return poidsInitial + total_variation;
+        return baseWeight + total_variation;
     }
 
     /**
@@ -97,10 +94,9 @@ export default class BilanModel {
 
         for (let d = 1; d <= totalJours; d++) {
             // Date du jour courant
-            const dayMs = baseDate.getTime() + d * 24 * 60 * 60 * 1000;
+            const dayMs = (baseDate.getTime() + (d - 1) * 24 * 60 * 60 * 1000);
 
             // Avancer le curseur des morts : compter ceux dont date_maty < dayMs
-            // (les akoho morts LE jour courant mangent encore ce jour-là)
             while (deathIdx < deathEvents.length && deathEvents[deathIdx].ms < dayMs) {
                 cumMorts += deathEvents[deathIdx].nombre;
                 deathIdx++;
@@ -115,7 +111,6 @@ export default class BilanModel {
 
 
             const sakafoJour = (config.sakafo_semaine / 7) * alive;
-            // console.log(`Jour ${d}: alive=${alive}, config_semaine=${semaineNum}, sakafo_jour=${sakafoJour}g`,);
             totalSakafo += sakafoJour;
         }
 
@@ -131,6 +126,9 @@ export default class BilanModel {
 
         // Prix de vente total des akoho vivants
         const pvTotalAkoho = nombreAkohoVivants * poidsMoyen * lotInfo.pv_par_gramme;
+
+        const poids_Moyen_Total = poidsMoyen * nombreAkohoVivants;
+        console.log(`Poids moyen total de tous les akoho vivants: ${poids_Moyen_Total} g`);
 
         // Coût total des atody
         const coutTotalAtody = totalAtody * lotInfo.pu_atody;
@@ -151,7 +149,8 @@ export default class BilanModel {
             revenus_totaux: revenustotaux,
             depenses_totales: depensesTotales,
             benefices: benefices,
-            cout_achat: lotInfo.cout_achat
+            cout_achat: lotInfo.cout_achat,
+            poids_Moyen_Total: poids_Moyen_Total
         };
     }
 
@@ -178,13 +177,13 @@ export default class BilanModel {
             }
 
             // 2. Calculer la durée exacte (semaines complètes + jours restants)
-            const duree = this.calculateDuree(lotInfo.date_achat, dateBilan, lotInfo.age_initial);
+            const duree = this.calculateDuree(lotInfo.date_achat, dateBilan);
 
             // 3. Récupérer toutes les configurations du lot
             const configurations = await RaceModel.getConfigurationsByRace(lotInfo.race_id);
 
             // 4. Calculer le poids moyen (par akoho vivant)
-            const poidsMoyen = this.calculatePoids(configurations, duree.semaines, duree.jours, lotInfo.age_initial);
+            const poidsMoyen = this.calculatePoids(configurations, duree.semaines, duree.jours, lotInfo.age_initial, lotInfo.poids_initial);
 
             // 5. Récupérer le nombre d'akoho maty (total) et l'historique par date
             const [totalAkohoMaty, deaths] = await Promise.all([

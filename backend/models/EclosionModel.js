@@ -83,8 +83,7 @@ export default class EclosionModel {
             `);
 
             const nouveauLotId = lotResult.recordset[0].nouveau_lot_id;
-            const nombre_tsy_foy = totalAtody - eclosionData.nombre_foy;
-            request.input('nombre_tsy_foy', Database.getSql().Int, nombre_tsy_foy);
+            request.input('nombre_tsy_foy', Database.getSql().Int, eclosionData.nombre_tsy_foy);
 
             // Insérer l'éclosion
             const result = await request.query(
@@ -92,12 +91,14 @@ export default class EclosionModel {
                  VALUES (@lot_id, @date_eclosion, @nombre_foy, @nombre_tsy_foy);
                  SELECT SCOPE_IDENTITY() AS id;`
             );
+            
+            const sommeFoyTsyfoy = eclosionData.nombre_foy + eclosionData.nombre_tsy_foy;
 
             // Insérer un enregistrement négatif dans Atody pour déduire les œufs éclos
             const atodyRequest = pool.request();
             atodyRequest.input('lot_id', Database.getSql().Int, eclosionData.lot_id);
             atodyRequest.input('date_production', Database.getSql().Date, eclosionData.date_eclosion);
-            atodyRequest.input('nombre_atody', Database.getSql().Int, -totalAtody);
+            atodyRequest.input('nombre_atody', Database.getSql().Int, -sommeFoyTsyfoy);
 
             await atodyRequest.query(
                 `INSERT INTO Atody (lot_id, date_production, nombre_atody)

@@ -31,7 +31,8 @@ export class LotsForm implements OnInit {
       date_achat: ['', Validators.required],
       nombre_akoho: [0, Validators.required],
       age: [0, Validators.required],
-      prix_achat: [0, Validators.required]
+      prix_achat: [0, Validators.required],
+      poids_initial: [0, Validators.required]
     });
   }
 
@@ -54,7 +55,8 @@ export class LotsForm implements OnInit {
             date_achat: '',
             nombre_akoho: 0,
             age: 0,
-            prix_achat: 0
+            prix_achat: 0,
+            poids_initial: 0
           });
           this.lotCreated.emit();
           this.cdr.detectChanges();

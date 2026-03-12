@@ -12,10 +12,11 @@ export default class LotModel {
             request.input('nombre_akoho', Database.getSql().Int, lotData.nombre_akoho);
             request.input('age', Database.getSql().Int, lotData.age);
             request.input('prix_achat', Database.getSql().Decimal(10, 2), lotData.prix_achat);
+            request.input('poids_initial', Database.getSql().Decimal(10, 2), lotData.poids_initial || null);
 
             const result = await request.query(
-                `INSERT INTO Lot (name, race_id, date_achat, nombre_akoho, age, prix_achat)
-                 VALUES (@name, @race_id, @date_achat, @nombre_akoho, @age, @prix_achat);
+                `INSERT INTO Lot (name, race_id, date_achat, nombre_akoho, age, prix_achat, poids_initial)
+                 VALUES (@name, @race_id, @date_achat, @nombre_akoho, @age, @prix_achat, @poids_initial);
                  SELECT SCOPE_IDENTITY() AS id;`
             );
 
@@ -34,7 +35,8 @@ export default class LotModel {
                 SELECT 
                     Lot.id, 
                     Lot.name, 
-                    Lot.race_id, 
+                    Lot.race_id,
+                    Lot.poids_initial, 
                     Race.nom as race_nom,
                     Lot.date_achat, 
                     Lot.nombre_akoho, 
@@ -66,6 +68,7 @@ export default class LotModel {
                     L.prix_achat AS cout_achat,
                     L.age AS age_initial,
                     L.date_achat,
+                    L.poids_initial,
                     R.id AS race_id,
                     R.nom AS race_nom,
                     R.pu_sakafo_par_gramme,

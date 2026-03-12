@@ -47,11 +47,6 @@ export default class AkohoMatyModel {
             const result = await request.query(
                 `INSERT INTO Akoho_Maty (lot_id, date_maty, nombre)
                  VALUES (@lot_id, @date_maty, @nombre);
-                 
-                 UPDATE Lot 
-                 SET nombre_akoho = nombre_akoho - @nombre 
-                 WHERE id = @lot_id;
-                 
                  SELECT SCOPE_IDENTITY() AS id;`
             );
 

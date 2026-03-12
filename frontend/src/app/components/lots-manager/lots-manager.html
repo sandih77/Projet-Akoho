@@ -25,6 +25,7 @@
             <th>Date d'achat</th>
             <th>Akoho vivants</th>
             <th>Âge (s.)</th>
+            <th>Poids Initial</th>
             <th>Prix d'achat</th>
           </tr>
         </thead>
@@ -36,6 +37,7 @@
             <td>{{ lot.date_achat | date:'dd/MM/yyyy' }}</td>
             <td><strong class="text-success">{{ lot.nombre_akoho }}</strong></td>
             <td>{{ lot.age }}</td>
+            <td>{{ lot.poids_initial }}</td>
             <td>{{ lot.prix_achat | number:'1.0-0' }} Ar</td>
           </tr>
         </tbody>

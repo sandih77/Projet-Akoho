@@ -24,6 +24,7 @@ export interface BilanData {
     revenus_totaux: number;
     depenses_totales: number;
     benefices: number;
+    poids_Moyen_Total: number;
 }
 
 @Injectable({
