@@ -94,7 +94,7 @@ export default class BilanModel {
 
         for (let d = 1; d <= totalJours; d++) {
             // Date du jour courant
-            const dayMs = (baseDate.getTime() + (d - 1) * 24 * 60 * 60 * 1000);
+            const dayMs = (baseDate.getTime() + (d) * 24 * 60 * 60 * 1000);
 
             // Avancer le curseur des morts : compter ceux dont date_maty < dayMs
             while (deathIdx < deathEvents.length && deathEvents[deathIdx].ms < dayMs) {
