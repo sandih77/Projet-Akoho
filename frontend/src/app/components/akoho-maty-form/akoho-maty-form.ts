@@ -31,7 +31,9 @@ export class AkohoMatyForm implements OnInit {
     this.akohoMatyForm = this.fb.group({
       lot_id: [0, Validators.required],
       date_maty: ['', Validators.required],
-      nombre: [0, Validators.required]
+      nombre: [0, Validators.required],
+      nombre_lahy: [0, Validators.required],
+      nombre_vavy: [0, Validators.required]
     });
   }
 
@@ -57,7 +59,9 @@ export class AkohoMatyForm implements OnInit {
           this.akohoMatyForm.reset({
             lot_id: 0,
             date_maty: '',
-            nombre: 0
+            nombre: 0,
+            nombre_lahy: 0,
+            nombre_vavy: 0
           });
           this.akohoMatyCreated.emit();
           this.cdr.detectChanges();

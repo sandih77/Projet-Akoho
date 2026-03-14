@@ -5,7 +5,6 @@ export default class ConfigurationModel {
         try {
             const pool = await Database.getPool();
 
-            // Unicité (race_id, semaine) — vérification avant insertion
             const checkReq = pool.request();
             checkReq.input('race_id_chk',  Database.getSql().Int, configData.race_id);
             checkReq.input('semaine_chk', Database.getSql().Int, configData.semaine);

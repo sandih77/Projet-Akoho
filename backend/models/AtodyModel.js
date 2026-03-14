@@ -21,7 +21,6 @@ export default class AtodyModel {
             const dateProduction = new Date(atodyData.date_production);
             const lotName = lotInfo.lot_name;
 
-            // Vérifier que la date de production n'est pas antérieure à la date d'achat
             if (dateProduction < dateAchat) {
                 throw new Error(
                     `Impossible: la date de production (${dateProduction.toLocaleDateString('fr-FR')}) ` +
@@ -36,7 +35,6 @@ export default class AtodyModel {
             const maxAtody = nombre_vavy * capacite_pondre;
             console.log(nombre_vavy, capacite_pondre, maxAtody);
 
-            // 2. Récupérer la somme actuelle des atody pour ce lot (positifs seulement)
             const sumAtodyRequest = pool.request();
             sumAtodyRequest.input('lot_id', Database.getSql().Int, atodyData.lot_id);
             const sumResult = await sumAtodyRequest.query(
@@ -46,7 +44,6 @@ export default class AtodyModel {
             const totalAtodyActuel = Number(sumResult.recordset[0].total_atody) || 0;
             const totalApresAjout = totalAtodyActuel + nombreAtodyDemande;
 
-            // 3. Vérifier que ne pas dépasser la capacité max
             if (totalApresAjout > maxAtody) {
                 throw new Error(
                     `Impossible: le lot "${lotName}" ne peut pas produire plus de ${maxAtody} atody ` +
@@ -68,7 +65,6 @@ export default class AtodyModel {
 
             const insertedId = result.recordset[0].id;
 
-            // Créer automatiquement l'éclosion après insertion d'atody
             try {
                 const eclosionResult = await EclosionModel.create(atodyData.lot_id, atodyData.date_production);
                 return {
@@ -120,7 +116,7 @@ export default class AtodyModel {
             request.input('date_bilan', Database.getSql().Date, dateBilan);
 
             const result = await request.query(`
-                SELECT ISNULL(SUM(CASE WHEN nombre_atody > 0 THEN nombre_atody ELSE 0 END), 0) AS total_atody
+                SELECT SUM(nombre_atody) as total_atody
                 FROM Atody 
                 WHERE lot_id = @lot_id AND date_production <= @date_bilan
             `);

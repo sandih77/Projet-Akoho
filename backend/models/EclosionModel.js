@@ -3,12 +3,7 @@ import AtodyModel from "./AtodyModel.js";
 import LotModel from "./LotModel.js";
 
 export default class EclosionModel {
-    /**
-     * Crée une éclosion automatique basée sur les paramètres de la race
-     * @param {number} lotId - ID du lot mère
-     * @param {string} datePondaison - date de pondaison (ISO) - la date est fournie depuis la création d'atody
-     * @returns {Promise<object>} - résultat de l'éclosion
-     */
+
     static async create(lotId, datePondaison) {
         try {
             const pool = await Database.getPool();
@@ -17,9 +12,8 @@ export default class EclosionModel {
                 throw new Error('Lot non trouvé pour l\'éclosion automatique.');
             }
 
-            const dureeEclosion = Number(lotInfo.duree_incubation) || 21; // Par défaut 21 jours
+            const dureeEclosion = Number(lotInfo.duree_incubation) || 21;
 
-            // 2. Calculer la date d'éclosion à partir de la date de pondaison
             const datePondObj = new Date(datePondaison);
             datePondObj.setHours(0, 0, 0, 0);
             const dateEclosionObj = new Date(datePondObj.getTime() + (dureeEclosion + 1) * 24 * 60 * 60 * 1000);
@@ -27,7 +21,6 @@ export default class EclosionModel {
 
             console.log(`Date pondaison: ${datePondaison}, Durée éclosion: ${dureeEclosion} jours, Date éclosion: ${dateEclosionISO}`);
 
-            // 3. Récupérer JUSTE les atody pondus à cette date exacte
             const totalAtody = await AtodyModel.getTotalByLotAndExactDate(lotId, datePondaison);
             console.log(`Total atody pondus le ${datePondaison} pour le lot ${lotId}: ${totalAtody}`);
 
@@ -35,7 +28,6 @@ export default class EclosionModel {
                 throw new Error(`Aucun atody disponible pour ce lot à la date ${dateEclosionISO}`);
             }
 
-            // 4. Calculer les nombres en fonction des pourcentages de la race
             const pourcentage_lamokany = Number(lotInfo.pourcentage_lamokany) || 0;
             const pourcentage_vavy = Number(lotInfo.pourcentage_vavy) || 0;
 
@@ -44,11 +36,7 @@ export default class EclosionModel {
             const nombre_vavy = Math.floor(nombre_foy * (pourcentage_vavy / 100));
             const nombre_lahy = nombre_foy - nombre_vavy;
 
-            console.log(`Éclosion automatique : ${totalAtody} atody → ${nombre_foy} foy, ${nombre_tsy_foy} tsy_foy`);
-            console.log(`Sexe : ${nombre_vavy} vavy, ${nombre_lahy} lahy`);
-
             const race_id = lotInfo.race_id;
-            console.log(lotInfo.lot_name)
             const nouveauLotNom = `Eclosion-${lotInfo.lot_name}-${dateEclosionISO}`;
 
             const createLotRequest = pool.request();
@@ -56,7 +44,7 @@ export default class EclosionModel {
             createLotRequest.input('race_id', Database.getSql().Int, race_id);
             createLotRequest.input('date_achat', Database.getSql().Date, dateEclosionISO);
             createLotRequest.input('nombre_akoho', Database.getSql().Int, nombre_foy);
-            createLotRequest.input('age', Database.getSql().Int, 0); 
+            createLotRequest.input('age', Database.getSql().Int, 0);
             createLotRequest.input('prix_achat', Database.getSql().Decimal(10, 2), 0);
             createLotRequest.input('nombre_vavy', Database.getSql().Int, nombre_vavy);
             createLotRequest.input('nombre_lahy', Database.getSql().Int, nombre_lahy);
@@ -74,7 +62,6 @@ export default class EclosionModel {
 
             const nouveauLotId = lotCreatedResult.lot.id;
 
-            // 6. Enregistrer l'éclosion
             const eclosionRequest = pool.request();
             eclosionRequest.input('lot_id', Database.getSql().Int, lotId);
             eclosionRequest.input('date_eclosion', Database.getSql().Date, dateEclosionISO);
@@ -89,7 +76,6 @@ export default class EclosionModel {
 
             const eclosionId = eclosionResult.recordset[0].id;
 
-            // 7. Déduire les atody du stock (directement en DB, pas via AtodyModel.create pour éviter boucle infinie)
             const sommeFoyTsyfoy = nombre_foy + nombre_tsy_foy;
             const atodyDeductRequest = pool.request();
             atodyDeductRequest.input('lot_id', Database.getSql().Int, lotId);

@@ -1,9 +1,49 @@
 import Database from "../config/db.js";
+import LotModel from "./LotModel.js";
 
 export default class AkohoMatyModel {
     static async create(akohoMatyData) {
         try {
             const pool = await Database.getPool();
+
+            const raceInfo = await LotModel.getWithRaceInfo(akohoMatyData.lot_id);
+
+            if (!raceInfo) {
+                throw new Error("Race introuvable");
+            }
+
+            const nombre_vavy_calc = Math.floor(
+                akohoMatyData.nombre * (raceInfo.pourcentage_vavy / 100)
+            );
+
+            const nombre_lahy_calc = akohoMatyData.nombre - nombre_vavy_calc;
+
+            const bothProvidedAndNonZero = akohoMatyData.nombre_vavy > 0 || akohoMatyData.nombre_lahy > 0;
+
+            let nombre_vavy, nombre_lahy;
+
+            if (bothProvidedAndNonZero) {
+                nombre_vavy = akohoMatyData.nombre_vavy;
+                nombre_lahy = akohoMatyData.nombre_lahy;
+            } else {
+                nombre_vavy = nombre_vavy_calc;
+                nombre_lahy = nombre_lahy_calc;
+            }
+
+            const total_sexe = nombre_vavy + nombre_lahy;
+            if (total_sexe !== akohoMatyData.nombre) {
+                throw new Error(
+                    `Erreur de cohérence : nombre_vavy (${nombre_vavy}) + nombre_lahy (${nombre_lahy}) = ${total_sexe} ` +
+                    `ne correspond pas à nombre_akoho (${akohoMatyData.nombre}). ` +
+                    `Vérifiez les nombres fournis ou laissez-les vides pour un calcul automatique basé sur le pourcentage vavy de la race (${raceInfo.pourcentage_vavy}%).`
+                );
+            }
+
+            if (nombre_vavy < 0 || nombre_lahy < 0) {
+                throw new Error(
+                    `Erreur: les nombres de vavy (${nombre_vavy}) et lahy (${nombre_lahy}) doivent être positifs.`
+                );
+            }
 
             // Vérifier que le lot existe et récupérer sa date d'achat
             const checkLotRequest = pool.request();
@@ -43,10 +83,12 @@ export default class AkohoMatyModel {
             request.input('lot_id', Database.getSql().Int, akohoMatyData.lot_id);
             request.input('date_maty', Database.getSql().Date, akohoMatyData.date_maty);
             request.input('nombre', Database.getSql().Int, akohoMatyData.nombre);
+            request.input('nombre_lahy', Database.getSql().Int, nombre_lahy);
+            request.input('nombre_vavy', Database.getSql().Int, nombre_vavy);
 
             const result = await request.query(
-                `INSERT INTO Akoho_Maty (lot_id, date_maty, nombre)
-                 VALUES (@lot_id, @date_maty, @nombre);
+                `INSERT INTO Akoho_Maty (lot_id, date_maty, nombre, nombre_lahy, nombre_vavy)
+                 VALUES (@lot_id, @date_maty, @nombre, @nombre_lahy, @nombre_vavy);
                  SELECT SCOPE_IDENTITY() AS id;`
             );
 

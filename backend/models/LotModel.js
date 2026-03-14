@@ -9,7 +9,6 @@ export default class LotModel {
 
             let prixAchat = lotData.prix_achat;
 
-            // Si prix_achat n'est pas fourni (null/undefined) ET ce n'est pas un lot éclos, calculer depuis la race
             const isLotEclos = lotData.name && lotData.name.startsWith('Eclosion-');
             const raceInfo = await this.getRaceById(lotData.race_id);
 
@@ -17,34 +16,28 @@ export default class LotModel {
                 throw new Error("Race introuvable");
             }
 
-            // Calculer prix seulement si : prix non fourni ET pas un lot éclos
             if ((lotData.prix_achat === null || lotData.prix_achat === 0) && !isLotEclos) {
                 prixAchat = raceInfo.prix_achat * lotData.nombre_akoho;
             }
 
-            // Calculer les nombres de vavy/lahy basés sur le pourcentage de la race
             const nombre_vavy_calc = Math.floor(
                 lotData.nombre_akoho * (raceInfo.pourcentage_vavy / 100)
             );
 
             const nombre_lahy_calc = lotData.nombre_akoho - nombre_vavy_calc;
 
-            // Vérifier si les deux valeurs ont été fournies ET sont > 0
             const bothProvidedAndNonZero = lotData.nombre_vavy > 0 || lotData.nombre_lahy > 0;
 
             let nombre_vavy, nombre_lahy;
 
             if (bothProvidedAndNonZero) {
-                // Les deux sont fournis ET > 0 : utiliser les valeurs fournies
                 nombre_vavy = lotData.nombre_vavy;
                 nombre_lahy = lotData.nombre_lahy;
             } else {
-                // Sinon, utiliser les valeurs calculées (évite de mélanger)
                 nombre_vavy = nombre_vavy_calc;
                 nombre_lahy = nombre_lahy_calc;
             }
 
-            // Vérifier la cohérence : la somme doit égaler nombre_akoho
             const total_sexe = nombre_vavy + nombre_lahy;
             if (total_sexe !== lotData.nombre_akoho) {
                 throw new Error(
@@ -54,7 +47,6 @@ export default class LotModel {
                 );
             }
 
-            // Vérifier que les nombres sont positifs
             if (nombre_vavy < 0 || nombre_lahy < 0) {
                 throw new Error(
                     `Erreur: les nombres de vavy (${nombre_vavy}) et lahy (${nombre_lahy}) doivent être positifs.`
