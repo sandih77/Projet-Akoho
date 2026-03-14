@@ -1,3 +1,6 @@
+<div *ngIf="errorMessage" class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> {{ errorMessage }}</div>
+<div *ngIf="successMessage" class="alert alert-success"><i class="fas fa-check-circle"></i> {{ successMessage }}</div>
+
 <form [formGroup]="lotsForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
         <label class="form-label" for="name">Nom du lot</label>
@@ -34,7 +37,17 @@
 
     <div class="form-group">
         <label class="form-label" for="prix_achat">Prix d'achat total (Ar)</label>
-        <input class="form-control" id="prix_achat" formControlName="prix_achat" type="number" min="0" />
+        <input class="form-control" id="prix_achat" formControlName="prix_achat" type="number" />
+    </div>
+
+    <div class="form-group">
+        <label class="form-label" for="nombre_lahy">Nombre lahy</label>
+        <input class="form-control" id="nombre_lahy" formControlName="nombre_lahy" type="number" />
+    </div>
+
+    <div class="form-group">
+        <label class="form-label" for="nombre_vavy">Nombre vavy</label>
+        <input class="form-control" id="nombre_vavy" formControlName="nombre_vavy" type="number" />
     </div>
 
     <button class="btn btn-primary" type="submit">

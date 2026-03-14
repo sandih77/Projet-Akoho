@@ -5,6 +5,7 @@ import { LotsServices } from '../../services/lots-services';
 import { AtodyService } from '../../services/atody.service';
 import { Lots } from '../../models/lot.models';
 import { Atody } from '../../models/atody.model';
+import { extractHttpErrorMessage } from '../../utils/http-error-message';
 
 @Component({
   selector: 'app-atody-form',
@@ -37,7 +38,10 @@ export class AtodyForm implements OnInit {
   ngOnInit(): void {
     this.lotsService.getAllLots().subscribe({
       next: (data: Lots[]) => { this.lots = data; this.cdr.detectChanges(); },
-      error: (err: any) => { console.error('Erreur récupération lots', err); this.cdr.detectChanges(); }
+      error: (err: any) => {
+        this.errorMessage = extractHttpErrorMessage(err, 'Impossible de charger les lots.');
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -65,26 +69,7 @@ export class AtodyForm implements OnInit {
           }, 3000);
         },
         error: (err: any) => {
-          console.error('Erreur création atody:', err);
-
-          // Extraire le message d'erreur du backend
-          if (err.error) {
-            if (typeof err.error === 'string') {
-              this.errorMessage = err.error;
-            } else if (err.error.details) {
-              this.errorMessage = err.error.details;
-            } else if (err.error.error) {
-              this.errorMessage = err.error.error;
-            } else if (err.error.message) {
-              this.errorMessage = err.error.message;
-            } else {
-              this.errorMessage = 'Erreur lors de la création de l\'atody.';
-            }
-          } else if (err.message) {
-            this.errorMessage = err.message;
-          } else {
-            this.errorMessage = 'Erreur lors de la création de l\'atody.';
-          }
+          this.errorMessage = extractHttpErrorMessage(err, 'Erreur lors de la creation de l\'atody.');
           this.cdr.detectChanges();
         }
       });

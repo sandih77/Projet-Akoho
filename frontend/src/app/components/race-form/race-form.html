@@ -1,3 +1,6 @@
+<div *ngIf="errorMessage" class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> {{ errorMessage }}</div>
+<div *ngIf="successMessage" class="alert alert-success"><i class="fas fa-check-circle"></i> {{ successMessage }}</div>
+
 <form [formGroup]="raceForm" (ngSubmit)="onSubmit()">
   <div class="form-group">
     <label class="form-label" for="nom">Nom de la race</label>
@@ -21,6 +24,32 @@
     <input class="form-control" type="number" id="prix-atody" step="0.01" formControlName="pu_atody"
       placeholder="500" />
   </div>
+
+  <div class="form-group">
+    <label class="form-label" for="duree-incubation">Durée incubation (jours)</label>
+    <input class="form-control" type="number" id="duree-incubation" step="0.01" formControlName="duree_incubation"
+      placeholder="21" />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="pourcentage-vavy">Pourcentage vavy</label>
+    <input class="form-control" type="number" id="pourcentage-vavy" step="0.01" formControlName="pourcentage_vavy" />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="prix-achat">Prix d'achat</label>
+    <input class="form-control" type="number" id="prix-achat" step="0.01" formControlName="prix_achat" />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="pourcentage-lamokany">Pourcentage lamokany</label>
+    <input class="form-control" type="number" id="pourcentage-lamokany" step="0.01" formControlName="pourcentage_lamokany" />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="capacite-pondre">Capacite à pondre</label>
+    <input class="form-control" type="number" id="capacite-pondre" step="0.01" formControlName="capacite_pondre" />
+  </div>  
 
   <button class="btn btn-primary" type="submit">
     <i class="fas fa-save"></i> Enregistrer

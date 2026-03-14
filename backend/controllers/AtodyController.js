@@ -1,4 +1,5 @@
 import AtodyModel from "../models/AtodyModel.js";
+import { sendError } from "../utils/httpError.js";
 
 export default class AtodyController {
     static async create(req, res) {
@@ -6,7 +7,7 @@ export default class AtodyController {
             const result = await AtodyModel.create(req.body);
             res.status(201).json(result);
         } catch (err) {
-            res.status(500).json({ error: 'Erreur serveur', details: err.message });
+            return sendError(res, err);
         }
     }
 
@@ -15,7 +16,7 @@ export default class AtodyController {
             const atody = await AtodyModel.getAll();
             res.status(200).json(atody);
         } catch (err) {
-            res.status(500).json({ error: 'Erreur serveur', details: err.message });
+            return sendError(res, err);
         }
     }
 }

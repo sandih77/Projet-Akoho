@@ -1,37 +1,70 @@
 <div class="page-header">
   <div class="page-icon"><i class="fas fa-seedling"></i></div>
-  <h2>Gestion des Éclosions</h2>
+  <div>
+    <h2>Gestion des Éclosions</h2>
+    <p class="page-subtitle">Suivi des performances d'incubation, lot par lot.</p>
+  </div>
 </div>
 
-<div class="two-col">
-
-  <!-- Form card -->
-  <div class="card">
-    <h3 class="card-title"><i class="fas fa-plus-circle"></i> Nouvelle Éclosion</h3>
-    <app-eclosion-form (eclosionCreated)="onEclosionCreated()"></app-eclosion-form>
+<div class="stats-grid eclosion-kpis">
+  <div class="stat-card info">
+    <span class="stat-label">Eclosions enregistrees</span>
+    <span class="stat-value">{{ totalEclosions }}</span>
   </div>
+  <div class="stat-card success">
+    <span class="stat-label">Poussins eclos</span>
+    <span class="stat-value">{{ totalFoy }}</span>
+  </div>
+  <div class="stat-card danger">
+    <span class="stat-label">Atody tsy foy</span>
+    <span class="stat-value">{{ totalTsyFoy }}</span>
+  </div>
+  <div class="stat-card accent">
+    <span class="stat-label">Taux moyen</span>
+    <span class="stat-value">{{ tauxMoyenEclosion | number:'1.0-1' }}%</span>
+  </div>
+</div>
 
+<div class="two-col two-col-single">
   <!-- List card -->
-  <div class="card">
-    <h3 class="card-title"><i class="fas fa-list"></i> Historique des Éclosions</h3>
+  <div class="card eclosion-main-card">
+    <h3 class="card-title"><i class="fas fa-list"></i> Historique detaille des eclosions</h3>
     <div class="table-wrapper">
       <table class="data-table" *ngIf="eclosionList.length > 0">
         <thead>
           <tr>
             <th>#</th>
             <th>Lot mère</th>
+            <th>Race</th>
             <th>Date d'éclosion</th>
+            <th>Total incubés</th>
             <th>Poussins éclos</th>
             <th>Atody tsy foy</th>
+            <th>Taux d'éclosion</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let eclosion of eclosionList">
             <td class="text-muted">{{ eclosion.id }}</td>
-            <td>{{ eclosion.lot_nom }}</td>
+            <td>
+              <div class="lot-name-stack">
+                <strong>{{ eclosion.lot_nom }}</strong>
+                <span class="lot-meta">Lot #{{ eclosion.lot_id }}</span>
+              </div>
+            </td>
+            <td><span class="badge badge-info">{{ eclosion.race_nom || 'N/A' }}</span></td>
             <td>{{ eclosion.date_eclosion | date:'dd/MM/yyyy' }}</td>
-            <td><span class="badge badge-warning">{{ eclosion.nombre_foy }} poussins</span></td>
-            <td><span class="badge badge-warning">{{ eclosion.nombre_tsy_foy }} </span></td>
+            <td><strong>{{ getTotalIncubes(eclosion) }}</strong></td>
+            <td><span class="badge badge-production">{{ eclosion.nombre_foy }} foy</span></td>
+            <td><span class="badge badge-eclosion">{{ eclosion.nombre_tsy_foy }} tsy foy</span></td>
+            <td>
+              <div class="taux-cell">
+                <span>{{ getTauxEclosion(eclosion) | number:'1.0-1' }}%</span>
+                <div class="taux-track">
+                  <div class="taux-fill" [style.width.%]="getTauxEclosion(eclosion)"></div>
+                </div>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>

@@ -1,0 +1,20 @@
+<div class="toast-stack" *ngIf="feedback.messages().length > 0">
+  <article
+    *ngFor="let message of feedback.messages(); trackBy: trackById"
+    class="toast-item"
+    [ngClass]="'toast-' + message.kind"
+  >
+    <div class="toast-icon">
+      <i class="fas" [ngClass]="getIcon(message.kind)"></i>
+    </div>
+ 
+    <div class="toast-content">
+      <p class="toast-title">{{ getTitle(message.kind) }}</p>
+      <p class="toast-text">{{ message.text }}</p>
+    </div>
+
+    <button class="toast-close" type="button" (click)="dismiss(message.id)" aria-label="Fermer">
+      <i class="fas fa-times"></i>
+    </button>
+  </article>
+</div>

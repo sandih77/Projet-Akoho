@@ -12,7 +12,9 @@ export class ConfigurationService {
     constructor(private http: HttpClient) { }
 
     create(configuration: Configuration): Observable<any> {
-        return this.http.post(`${this.apiUrl}/create-configuration`, configuration);
+        return this.http.post(`${this.apiUrl}/create-configuration`, configuration, {
+            headers: { 'x-skip-global-error': 'true' }
+        });
     }
 
     getAll(): Observable<Configuration[]> {

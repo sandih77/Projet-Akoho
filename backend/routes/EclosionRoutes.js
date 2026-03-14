@@ -8,7 +8,6 @@ export default class EclosionRoutes {
   }
 
   initRoutes() {
-    this.router.post("/create-eclosion", EclosionController.create);
     this.router.get("/list-eclosion", EclosionController.getAll);
   }
 

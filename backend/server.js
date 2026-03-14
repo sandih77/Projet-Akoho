@@ -8,6 +8,7 @@ import EclosionRoutes from "./routes/EclosionRoutes.js";
 import BilanRoutes from "./routes/BilanRoutes.js";
 import ConfigurationRoutes from "./routes/ConfigurationRoutes.js";
 import Database from "./config/db.js";
+import { formatError } from "./utils/httpError.js";
 
 const app = express();
 const PORT = 3000;
@@ -35,6 +36,24 @@ app.use("/api/bilan", bilanRoutes.getRouter());
 
 const configurationRoutes = new ConfigurationRoutes();
 app.use("/api/configuration", configurationRoutes.getRouter());
+
+app.use((req, res) => {
+    res.status(404).json({
+        error: "Ressource introuvable",
+        details: `Route non trouvee: ${req.method} ${req.originalUrl}`,
+        code: "HTTP_404"
+    });
+});
+
+app.use((err, req, res, next) => {
+    if (res.headersSent) {
+        return next(err);
+    }
+
+    const { status, payload } = formatError(err);
+    console.error("Erreur non geree:", err);
+    return res.status(status).json(payload);
+});
 
 // Connexion à la base de données au démarrage
 Database.connect()

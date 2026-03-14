@@ -1,6 +1,28 @@
 <div class="page-header">
   <div class="page-icon"><i class="fas fa-box-open"></i></div>
-  <h2>Gestion des Lots</h2>
+  <div>
+    <h2>Gestion des Lots</h2>
+    <p class="page-subtitle">Vue complete des lots, de leur composition et des couts.</p>
+  </div>
+</div>
+
+<div class="stats-grid lots-kpis">
+  <div class="stat-card info">
+    <span class="stat-label">Nombre de lots</span>
+    <span class="stat-value">{{ totalLots }}</span>
+  </div>
+  <div class="stat-card success">
+    <span class="stat-label">Akoho total</span>
+    <span class="stat-value">{{ totalAkoho }}</span>
+  </div>
+  <div class="stat-card accent">
+    <span class="stat-label">Investissement</span>
+    <span class="stat-value">{{ totalInvestissement | number:'1.0-0' }} Ar</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Age moyen</span>
+    <span class="stat-value">{{ moyenneAge | number:'1.0-1' }} sem.</span>
+  </div>
 </div>
 
 <div class="two-col">
@@ -15,30 +37,50 @@
   <!-- List card -->
   <div class="card">
     <h3 class="card-title"><i class="fas fa-list"></i> Liste des Lots</h3>
+    <div class="lots-summary-row" *ngIf="lots.length > 0">
+      <span class="badge badge-info">Vavy: {{ totalVavy }}</span>
+      <span class="badge badge-warning">Lahy: {{ totalLahy }}</span>
+    </div>
+
     <div class="table-wrapper">
       <table class="data-table" *ngIf="lots.length > 0">
         <thead>
           <tr>
             <th>#</th>
-            <th>Nom</th>
+            <th>Lot</th>
             <th>Race</th>
             <th>Date d'achat</th>
-            <th>Akoho vivants</th>
             <th>Âge (s.)</th>
-            <th>Poids Initial</th>
+            <th>Akoho</th>
+            <th>Vavy</th>
+            <th>Lahy</th>
+            <th>Ratio vavy</th>
+            <th>Poids initial</th>
             <th>Prix d'achat</th>
+            <th>Prix / akoho</th>
+            <th>Race ID</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let lot of lots">
+          <tr *ngFor="let lot of lots" [class.lot-eclosion-row]="isEclosionLot(lot)">
             <td class="text-muted">{{ lot.id }}</td>
-            <td><strong>{{ lot.name }}</strong></td>
+            <td>
+              <div class="lot-name-stack">
+                <strong>{{ lot.name }}</strong>
+                <span class="lot-chip" *ngIf="isEclosionLot(lot)">Issue d'eclosion</span>
+              </div>
+            </td>
             <td><span class="badge badge-info">{{ lot.race_nom }}</span></td>
             <td>{{ lot.date_achat | date:'dd/MM/yyyy' }}</td>
-            <td><strong class="text-success">{{ lot.nombre_akoho }}</strong></td>
             <td>{{ lot.age }}</td>
-            <td>{{ lot.poids_initial }}</td>
+            <td><strong class="text-success">{{ lot.nombre_akoho }}</strong></td>
+            <td>{{ lot.nombre_vavy ?? 0 }}</td>
+            <td>{{ lot.nombre_lahy ?? 0 }}</td>
+            <td>{{ getTauxVavy(lot) | number:'1.0-1' }}%</td>
+            <td>{{ lot.poids_initial ?? '-' }}</td>
             <td>{{ lot.prix_achat | number:'1.0-0' }} Ar</td>
+            <td>{{ getPrixUnitaire(lot) | number:'1.0-0' }} Ar</td>
+            <td class="text-muted">{{ lot.race_id }}</td>
           </tr>
         </tbody>
       </table>

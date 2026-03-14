@@ -2,6 +2,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BilanService, BilanData } from '../../services/bilan.service';
 import { CommonModule } from '@angular/common';
+import { extractHttpErrorMessage } from '../../utils/http-error-message';
 
 @Component({
   selector: 'app-bilan',
@@ -41,11 +42,7 @@ export class Bilan {
         this.cdr.detectChanges();
       },
       error: (err: any) => {
-        let msg = 'Erreur lors de la récupération des bilans.';
-        if (err.error?.details) msg = err.error.details;
-        else if (err.error?.error) msg = err.error.error;
-        else if (err.message) msg = err.message;
-        this.errorMessage = msg;
+        this.errorMessage = extractHttpErrorMessage(err, 'Erreur lors de la recuperation des bilans.');
         this.isLoading = false;
         this.cdr.detectChanges();
       }

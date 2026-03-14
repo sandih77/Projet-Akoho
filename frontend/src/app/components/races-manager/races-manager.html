@@ -24,6 +24,11 @@
             <th>PU Sakafo / g</th>
             <th>PV / g</th>
             <th>PU Atody</th>
+            <th>Capacité de pondre</th>
+            <th>Prix d'achat</th>
+            <th>Pourcentage Vavy</th>
+            <th>Pourcentage Lamokany</th>
+            <th>Durée Incubation</th>
           </tr>
         </thead>
         <tbody>
@@ -33,6 +38,11 @@
             <td>{{ race.pu_sakafo_par_gramme | number:'1.0-0' }} Ar</td>
             <td>{{ race.pv_par_gramme | number:'1.0-0' }} Ar</td>
             <td>{{ race.pu_atody | number:'1.0-0' }} Ar</td>
+            <td>{{ race.capacite_pondre | number:'1.0-0' }}</td>
+            <td>{{ race.prix_achat | number:'1.0-0' }} Ar</td>
+            <td>{{ race.pourcentage_vavy | number:'1.0-0' }}%</td>
+            <td>{{ race.pourcentage_lamokany | number:'1.0-0' }}%</td>
+            <td>{{ race.duree_incubation | number:'1.0-0' }} jours</td>
           </tr>
         </tbody>
       </table>

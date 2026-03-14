@@ -12,7 +12,9 @@ export class AkohoMatyService {
   constructor(private http: HttpClient) { }
 
   create(akohoMaty: AkohoMaty): Observable<any> {
-    return this.http.post(`${this.apiUrl}/create-akoho-maty`, akohoMaty);
+    return this.http.post(`${this.apiUrl}/create-akoho-maty`, akohoMaty, {
+      headers: { 'x-skip-global-error': 'true' }
+    });
   }
 
   getAll(): Observable<AkohoMaty[]> {

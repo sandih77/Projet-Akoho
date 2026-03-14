@@ -12,7 +12,9 @@ export class RaceService {
     constructor(private http: HttpClient) { }
 
     createRace(race: Race): Observable<any> {
-        return this.http.post(`${this.apiUrl}/create-race`, race);
+        return this.http.post(`${this.apiUrl}/create-race`, race, {
+            headers: { 'x-skip-global-error': 'true' }
+        });
     }
 
     getAllRaces(): Observable<Race[]> {

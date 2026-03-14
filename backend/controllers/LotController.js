@@ -1,4 +1,5 @@
 import LotModel from "../models/LotModel.js";
+import { sendError } from "../utils/httpError.js";
 
 export default class LotController {
     static async create(req, res) {
@@ -6,7 +7,7 @@ export default class LotController {
             const result = await LotModel.create(req.body);
             res.status(201).json(result);
         } catch (err) {
-            res.status(500).json({ error: 'Erreur serveur', details: err.message });
+            return sendError(res, err);
         }
     }
 
@@ -15,7 +16,7 @@ export default class LotController {
             const lots = await LotModel.getAll();
             res.status(200).json(lots);
         } catch (err) {
-            res.status(500).json({ error: 'Erreur serveur', details: err.message });
+            return sendError(res, err);
         }
     }
 }

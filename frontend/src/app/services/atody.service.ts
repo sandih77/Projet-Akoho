@@ -12,7 +12,9 @@ export class AtodyService {
     constructor(private http: HttpClient) { }
 
     create(atody: Atody): Observable<any> {
-        return this.http.post(`${this.apiUrl}/create-atody`, atody);
+        return this.http.post(`${this.apiUrl}/create-atody`, atody, {
+            headers: { 'x-skip-global-error': 'true' }
+        });
     }
 
     getAll(): Observable<Atody[]> {

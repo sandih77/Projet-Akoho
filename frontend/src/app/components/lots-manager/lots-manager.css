@@ -1,0 +1,30 @@
+.lots-kpis {
+	margin-bottom: 20px;
+}
+
+.lots-summary-row {
+	display: flex;
+	gap: 8px;
+	margin-bottom: 14px;
+}
+
+.lot-name-stack {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.lot-chip {
+	display: inline-flex;
+	width: fit-content;
+	padding: 2px 8px;
+	border-radius: 999px;
+	background: #fdf3e0;
+	color: #a15a00;
+	font-size: 11px;
+	font-weight: 700;
+}
+
+.lot-eclosion-row {
+	background: linear-gradient(90deg, rgba(253, 243, 224, 0.48), rgba(255, 255, 255, 0.92));
+}

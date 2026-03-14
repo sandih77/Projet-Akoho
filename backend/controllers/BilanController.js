@@ -1,4 +1,5 @@
 import BilanModel from "../models/BilanModel.js";
+import { sendError } from "../utils/httpError.js";
 
 export default class BilanController {
     static async getAllBilans(req, res) {
@@ -10,7 +11,7 @@ export default class BilanController {
             const bilans = await BilanModel.getAllBilans(date_bilan);
             res.status(200).json(bilans);
         } catch (err) {
-            res.status(500).json({ error: 'Erreur serveur', details: err.message });
+            return sendError(res, err);
         }
     }
 
@@ -35,10 +36,7 @@ export default class BilanController {
 
             res.status(200).json(bilan);
         } catch (err) {
-            res.status(500).json({
-                error: 'Erreur serveur',
-                details: err.message
-            });
+            return sendError(res, err);
         }
     }
 }

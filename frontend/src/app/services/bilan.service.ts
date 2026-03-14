@@ -36,10 +36,14 @@ export class BilanService {
     constructor(private http: HttpClient) { }
 
     getBilanByLotAndDate(lotId: number, dateBilan: string): Observable<BilanData> {
-        return this.http.get<BilanData>(`${this.apiUrl}?lot_id=${lotId}&date_bilan=${dateBilan}`);
+        return this.http.get<BilanData>(`${this.apiUrl}?lot_id=${lotId}&date_bilan=${dateBilan}`, {
+            headers: { 'x-skip-global-error': 'true' }
+        });
     }
 
     getAllBilans(dateBilan: string): Observable<BilanData[]> {
-        return this.http.get<BilanData[]>(`${this.apiUrl}/all?date_bilan=${dateBilan}`);
+        return this.http.get<BilanData[]>(`${this.apiUrl}/all?date_bilan=${dateBilan}`, {
+            headers: { 'x-skip-global-error': 'true' }
+        });
     }
 }

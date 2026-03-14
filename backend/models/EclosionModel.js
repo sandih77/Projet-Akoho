@@ -1,128 +1,129 @@
 import Database from "../config/db.js";
 import AtodyModel from "./AtodyModel.js";
+import LotModel from "./LotModel.js";
 
 export default class EclosionModel {
-    static async create(eclosionData) {
+    /**
+     * Crée une éclosion automatique basée sur les paramètres de la race
+     * @param {number} lotId - ID du lot mère
+     * @param {string} datePondaison - date de pondaison (ISO) - la date est fournie depuis la création d'atody
+     * @returns {Promise<object>} - résultat de l'éclosion
+     */
+    static async create(lotId, datePondaison) {
         try {
             const pool = await Database.getPool();
-
-            // Vérifier que le lot existe et récupérer sa date d'achat
-            const checkLotRequest = pool.request();
-            checkLotRequest.input('lot_id', Database.getSql().Int, eclosionData.lot_id);
-            const lotCheck = await checkLotRequest.query(
-                'SELECT date_achat, name FROM Lot WHERE id = @lot_id'
-            );
-
-            if (lotCheck.recordset.length === 0) {
-                throw new Error('Lot non trouvé');
+            const lotInfo = await LotModel.getWithRaceInfo(lotId);
+            if (!lotInfo) {
+                throw new Error('Lot non trouvé pour l\'éclosion automatique.');
             }
 
-            const dateAchat = new Date(lotCheck.recordset[0].date_achat);
-            const dateEclosion = new Date(eclosionData.date_eclosion);
-            const lotName = lotCheck.recordset[0].name;
+            const dureeEclosion = Number(lotInfo.duree_incubation) || 21; // Par défaut 21 jours
 
-            // Vérifier que la date d'éclosion n'est pas antérieure à la date d'achat
-            if (dateEclosion < dateAchat) {
-                throw new Error(
-                    `Impossible: la date d'éclosion (${dateEclosion.toLocaleDateString('fr-FR')}) ` +
-                    `est antérieure à la date d'achat du lot "${lotName}" ` +
-                    `(${dateAchat.toLocaleDateString('fr-FR')}). ` +
-                    `Le lot n'existait pas encore à cette date.`
-                );
+            // 2. Calculer la date d'éclosion à partir de la date de pondaison
+            const datePondObj = new Date(datePondaison);
+            datePondObj.setHours(0, 0, 0, 0);
+            const dateEclosionObj = new Date(datePondObj.getTime() + (dureeEclosion + 1) * 24 * 60 * 60 * 1000);
+            const dateEclosionISO = dateEclosionObj.toISOString().split('T')[0];
+
+            console.log(`Date pondaison: ${datePondaison}, Durée éclosion: ${dureeEclosion} jours, Date éclosion: ${dateEclosionISO}`);
+
+            // 3. Récupérer JUSTE les atody pondus à cette date exacte
+            const totalAtody = await AtodyModel.getTotalByLotAndExactDate(lotId, datePondaison);
+            console.log(`Total atody pondus le ${datePondaison} pour le lot ${lotId}: ${totalAtody}`);
+
+            if (totalAtody <= 0) {
+                throw new Error(`Aucun atody disponible pour ce lot à la date ${dateEclosionISO}`);
             }
 
-            const request = pool.request();
-            request.input('lot_id', Database.getSql().Int, eclosionData.lot_id);
-            request.input('date_eclosion', Database.getSql().Date, eclosionData.date_eclosion);
-            request.input('nombre_foy', Database.getSql().Int, eclosionData.nombre_foy);
+            // 4. Calculer les nombres en fonction des pourcentages de la race
+            const pourcentage_lamokany = Number(lotInfo.pourcentage_lamokany) || 0;
+            const pourcentage_vavy = Number(lotInfo.pourcentage_vavy) || 0;
 
-            // Vérifier le nombre total d'atody disponibles pour ce lot à cette date
-            const totalAtody = await AtodyModel.getTotalByLotAndDate(
-                eclosionData.lot_id,
-                eclosionData.date_eclosion
-            );
+            const nombre_tsy_foy = Math.floor(totalAtody * (pourcentage_lamokany / 100));
+            const nombre_foy = totalAtody - nombre_tsy_foy;
+            const nombre_vavy = Math.floor(nombre_foy * (pourcentage_vavy / 100));
+            const nombre_lahy = nombre_foy - nombre_vavy;
 
-            if (eclosionData.nombre_foy > totalAtody) {
-                throw new Error(
-                    `Impossible: le lot n'a que ${totalAtody} atody disponible(s) à cette date, ` +
-                    `mais vous essayez d'en éclore ${eclosionData.nombre_foy}`
-                );
-            }
+            console.log(`Éclosion automatique : ${totalAtody} atody → ${nombre_foy} foy, ${nombre_tsy_foy} tsy_foy`);
+            console.log(`Sexe : ${nombre_vavy} vavy, ${nombre_lahy} lahy`);
 
-            // Récupérer les infos du lot mère (race, etc.)
-            const lotMere = await pool.request()
-                .input('lot_id_mere', Database.getSql().Int, eclosionData.lot_id)
-                .query(`
-                    SELECT L.name, L.race_id, R.nom as race_nom 
-                    FROM Lot L 
-                    INNER JOIN Race R ON L.race_id = R.id 
-                    WHERE L.id = @lot_id_mere
-                `);
-
-            if (lotMere.recordset.length === 0) {
-                throw new Error('Lot mère non trouvé');
-            }
-
-            const { race_id, name: lot_mere_name, race_nom } = lotMere.recordset[0];
-
-            // Créer le nouvel lot à partir de l'éclosion
-            const nouveauLotNom = `Eclosion-${lot_mere_name}-${new Date(eclosionData.date_eclosion).toISOString().split('T')[0]}`;
+            const race_id = lotInfo.race_id;
+            console.log(lotInfo.lot_name)
+            const nouveauLotNom = `Eclosion-${lotInfo.lot_name}-${dateEclosionISO}`;
 
             const createLotRequest = pool.request();
             createLotRequest.input('name', Database.getSql().VarChar, nouveauLotNom);
             createLotRequest.input('race_id', Database.getSql().Int, race_id);
-            createLotRequest.input('date_achat', Database.getSql().Date, eclosionData.date_eclosion);
-            createLotRequest.input('nombre_akoho', Database.getSql().Int, eclosionData.nombre_foy);
-            createLotRequest.input('age', Database.getSql().Int, 0); // Nouveau-nés = 0 semaines
-            createLotRequest.input('prix_achat', Database.getSql().Decimal(10, 2), 0); // Pas d'achat
+            createLotRequest.input('date_achat', Database.getSql().Date, dateEclosionISO);
+            createLotRequest.input('nombre_akoho', Database.getSql().Int, nombre_foy);
+            createLotRequest.input('age', Database.getSql().Int, 0); 
+            createLotRequest.input('prix_achat', Database.getSql().Decimal(10, 2), 0);
+            createLotRequest.input('nombre_vavy', Database.getSql().Int, nombre_vavy);
+            createLotRequest.input('nombre_lahy', Database.getSql().Int, nombre_lahy);
 
-            const lotResult = await createLotRequest.query(`
-                INSERT INTO Lot (name, race_id, date_achat, nombre_akoho, age, prix_achat)
-                VALUES (@name, @race_id, @date_achat, @nombre_akoho, @age, @prix_achat);
-                SELECT SCOPE_IDENTITY() AS nouveau_lot_id;
-            `);
+            const lotCreatedResult = await LotModel.create({
+                name: nouveauLotNom,
+                race_id: race_id,
+                date_achat: dateEclosionISO,
+                nombre_akoho: nombre_foy,
+                age: 0,
+                prix_achat: 0,
+                nombre_vavy: nombre_vavy,
+                nombre_lahy: nombre_lahy
+            });
 
-            const nouveauLotId = lotResult.recordset[0].nouveau_lot_id;
-            request.input('nombre_tsy_foy', Database.getSql().Int, eclosionData.nombre_tsy_foy);
+            const nouveauLotId = lotCreatedResult.lot.id;
 
-            // Insérer l'éclosion
-            const result = await request.query(
+            // 6. Enregistrer l'éclosion
+            const eclosionRequest = pool.request();
+            eclosionRequest.input('lot_id', Database.getSql().Int, lotId);
+            eclosionRequest.input('date_eclosion', Database.getSql().Date, dateEclosionISO);
+            eclosionRequest.input('nombre_foy', Database.getSql().Int, nombre_foy);
+            eclosionRequest.input('nombre_tsy_foy', Database.getSql().Int, nombre_tsy_foy);
+
+            const eclosionResult = await eclosionRequest.query(
                 `INSERT INTO Eclosion (lot_id, date_eclosion, nombre_foy, nombre_tsy_foy)
                  VALUES (@lot_id, @date_eclosion, @nombre_foy, @nombre_tsy_foy);
                  SELECT SCOPE_IDENTITY() AS id;`
             );
-            
-            const sommeFoyTsyfoy = eclosionData.nombre_foy + eclosionData.nombre_tsy_foy;
 
-            // Insérer un enregistrement négatif dans Atody pour déduire les œufs éclos
-            const atodyRequest = pool.request();
-            atodyRequest.input('lot_id', Database.getSql().Int, eclosionData.lot_id);
-            atodyRequest.input('date_production', Database.getSql().Date, eclosionData.date_eclosion);
-            atodyRequest.input('nombre_atody', Database.getSql().Int, -sommeFoyTsyfoy);
+            const eclosionId = eclosionResult.recordset[0].id;
 
-            await atodyRequest.query(
+            // 7. Déduire les atody du stock (directement en DB, pas via AtodyModel.create pour éviter boucle infinie)
+            const sommeFoyTsyfoy = nombre_foy + nombre_tsy_foy;
+            const atodyDeductRequest = pool.request();
+            atodyDeductRequest.input('lot_id', Database.getSql().Int, lotId);
+            atodyDeductRequest.input('date_production', Database.getSql().Date, dateEclosionISO);
+            atodyDeductRequest.input('nombre_atody', Database.getSql().Int, -sommeFoyTsyfoy);
+
+            await atodyDeductRequest.query(
                 `INSERT INTO Atody (lot_id, date_production, nombre_atody)
                  VALUES (@lot_id, @date_production, @nombre_atody);`
             );
 
-            const insertedId = result.recordset[0].id;
             return {
-                message: `Eclosion créée avec succès ! Nouveau lot "${nouveauLotNom}" (${race_nom}) créé avec ${eclosionData.nombre_foy} akoho(s). ${eclosionData.nombre_foy} atody déduits du stock.`,
-                eclosion: { id: insertedId, ...eclosionData },
+                message: `Éclosion automatique créée ! Lot "${nouveauLotNom}" (${nombre_vavy} vavy, ${nombre_lahy} lahy) créé avec ${nombre_foy} akoho(s).`,
+                eclosion: {
+                    id: eclosionId,
+                    lot_id: lotId,
+                    date_eclosion: dateEclosionISO,
+                    nombre_foy: nombre_foy,
+                    nombre_tsy_foy: nombre_tsy_foy
+                },
                 nouveau_lot: {
                     id: nouveauLotId,
                     name: nouveauLotNom,
                     race_id: race_id,
-                    nombre_akoho: eclosionData.nombre_foy
-                },
-                atody_deduits: eclosionData.nombre_foy
+                    nombre_akoho: nombre_foy,
+                    nombre_vavy: nombre_vavy,
+                    nombre_lahy: nombre_lahy
+                }
             };
         } catch (err) {
-            console.error('Erreur création eclosion:', err);
+            console.error('Erreur création éclosion automatique:', err);
             throw err;
         }
     }
-
     static async getAll() {
         try {
             const pool = await Database.getPool();
@@ -131,11 +132,23 @@ export default class EclosionModel {
                     Eclosion.id, 
                     Eclosion.lot_id, 
                     Lot.name as lot_nom,
+                    Lot.race_id,
+                    Race.nom as race_nom,
+                    Lot.nombre_akoho as lot_nombre_akoho,
+                    Lot.nombre_vavy as lot_nombre_vavy,
+                    Lot.nombre_lahy as lot_nombre_lahy,
                     Eclosion.date_eclosion, 
                     Eclosion.nombre_foy,
-                    Eclosion.nombre_tsy_foy
+                    Eclosion.nombre_tsy_foy,
+                    (Eclosion.nombre_foy + Eclosion.nombre_tsy_foy) as total_incubes,
+                    CASE
+                        WHEN (Eclosion.nombre_foy + Eclosion.nombre_tsy_foy) > 0
+                            THEN CAST((Eclosion.nombre_foy * 100.0) / (Eclosion.nombre_foy + Eclosion.nombre_tsy_foy) AS DECIMAL(5, 2))
+                        ELSE 0
+                    END as taux_eclosion
                 FROM Eclosion
-                INNER JOIN Lot ON Eclosion.lot_id = Lot.id
+                JOIN Lot ON Eclosion.lot_id = Lot.id
+                JOIN Race ON Lot.race_id = Race.id
                 ORDER BY Eclosion.date_eclosion DESC
             `);
             return result.recordset;

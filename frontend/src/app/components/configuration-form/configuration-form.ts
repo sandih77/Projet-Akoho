@@ -5,6 +5,7 @@ import { ConfigurationService } from '../../services/configuration.service';
 import { Configuration } from '../../models/configuration.model';
 import { Race } from '../../models/race.model';
 import { RaceService } from '../../services/race.services';
+import { extractHttpErrorMessage } from '../../utils/http-error-message';
 
 @Component({
     selector: 'app-configuration-form',
@@ -38,7 +39,10 @@ export class ConfigurationForm implements OnInit {
     ngOnInit(): void {
         this.racesServices.getAllRaces().subscribe({
             next: (data: Race[]) => { this.races = data; this.cdr.detectChanges(); },
-            error: (err: any) => { console.error('Erreur récupération races', err); this.cdr.detectChanges(); },
+            error: (err: any) => {
+                this.errorMessage = extractHttpErrorMessage(err, 'Impossible de charger les races.');
+                this.cdr.detectChanges();
+            },
         });
     }
 
@@ -56,12 +60,7 @@ export class ConfigurationForm implements OnInit {
                     setTimeout(() => { this.successMessage = ''; this.cdr.detectChanges(); }, 3000);
                 },
                 error: (err: any) => {
-                    this.errorMessage =
-                        err?.error?.details ||
-                        err?.error?.error ||
-                        err?.error?.message ||
-                        err?.message ||
-                        'Une erreur est survenue.';
+                    this.errorMessage = extractHttpErrorMessage(err, 'Une erreur est survenue.');
                     this.cdr.detectChanges();
                 },
             });

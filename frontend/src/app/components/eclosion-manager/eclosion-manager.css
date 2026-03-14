@@ -1,1 +1,43 @@
-/* Styles pour eclosion-manager */
+.eclosion-kpis {
+	margin-bottom: 20px;
+}
+
+.eclosion-main-card {
+	overflow: hidden;
+}
+
+.lot-name-stack {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.lot-meta {
+	font-size: 11px;
+	color: var(--text-secondary);
+}
+
+.taux-cell {
+	min-width: 150px;
+}
+
+.taux-cell > span {
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--primary-dark);
+}
+
+.taux-track {
+	margin-top: 4px;
+	height: 7px;
+	width: 100%;
+	border-radius: 999px;
+	background: #e7ece8;
+	overflow: hidden;
+}
+
+.taux-fill {
+	height: 100%;
+	border-radius: 999px;
+	background: linear-gradient(90deg, #5ab95f, #2f8a39);
+}

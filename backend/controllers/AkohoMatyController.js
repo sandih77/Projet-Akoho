@@ -1,4 +1,5 @@
 import AkohoMatyModel from "../models/AkohoMatyModel.js";
+import { sendError } from "../utils/httpError.js";
 
 export default class AkohoMatyController {
     static async create(req, res) {
@@ -6,7 +7,7 @@ export default class AkohoMatyController {
             const result = await AkohoMatyModel.create(req.body);
             res.status(201).json(result);
         } catch (err) {
-            res.status(500).json({ error: 'Erreur serveur', details: err.message });
+            return sendError(res, err);
         }
     }
 
@@ -15,7 +16,7 @@ export default class AkohoMatyController {
             const akohoMaty = await AkohoMatyModel.getAll();
             res.status(200).json(akohoMaty);
         } catch (err) {
-            res.status(500).json({ error: 'Erreur serveur', details: err.message });
+            return sendError(res, err);
         }
     }
 }

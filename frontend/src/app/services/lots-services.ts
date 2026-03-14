@@ -13,7 +13,9 @@ export class LotsServices {
   constructor(private http: HttpClient) { }
 
   create(lot: Lots): Observable<any> {
-    return this.http.post(`${this.apiUrl}/create-lot`, lot);
+    return this.http.post(`${this.apiUrl}/create-lot`, lot, {
+      headers: { 'x-skip-global-error': 'true' }
+    });
   }
 
   getAllLots(): Observable<Lots[]> {
