@@ -184,7 +184,7 @@ export default class AkohoMatyModel {
                 WHERE lot_id = @lot_id AND date_maty <= @date_bilan
             `);
 
-            return result.recordset;
+            return result.recordset[0];
         } catch (err) {
             throw err;
         }
