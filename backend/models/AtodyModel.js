@@ -1,4 +1,5 @@
 import Database from "../config/db.js";
+import AkohoMatyModel from "./AkohoMatyModel.js";
 import EclosionModel from "./EclosionModel.js";
 import LotModel from "./LotModel.js";
 
@@ -31,7 +32,12 @@ export default class AtodyModel {
             }
 
             const capacite_pondre = Number(lotInfo.capacite_pondre) || 0;
-            const nombre_vavy = Number(lotInfo.nombre_vavy) || 0;
+            const matyInfo = await AkohoMatyModel.getNombreVavyMaty(atodyData.lot_id, atodyData.date_production);
+            if (!matyInfo) {
+                throw new Error('ERROR MATY');
+            }
+            const nombre_vavy = Number(lotInfo.nombre_vavy) - matyInfo.total_vavy_maty;
+            console.log(matyInfo.total_vavy_maty);
             const maxAtody = nombre_vavy * capacite_pondre;
             console.log(nombre_vavy, capacite_pondre, maxAtody);
 

@@ -121,3 +121,5 @@ INSERT INTO Akoho_Maty (lot_id, date_maty, nombre) VALUES
 -- ============================================================
 INSERT INTO Eclosion (lot_id, date_eclosion, nombre_foy) VALUES
     (1, '2025-01-28', 15);
+
+SELECT SUM(nombre_vavy) as total_vavy_maty FROM akoho_maty WHERE lot_id = 36 AND date_maty <= '2026-03-04'

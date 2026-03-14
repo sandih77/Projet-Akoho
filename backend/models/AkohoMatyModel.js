@@ -147,10 +147,6 @@ export default class AkohoMatyModel {
         }
     }
 
-    /**
-     * Retourne la liste des morts classée par date (du lot, jusqu'à date_bilan).
-     * Chaque ligne : { date_maty: Date, nombre: number }
-     */
     static async getDeathsByLotAndDate(lotId, dateBilan) {
         try {
             const pool = await Database.getPool();
@@ -167,9 +163,29 @@ export default class AkohoMatyModel {
                 ORDER BY date_maty ASC
             `);
 
-            return result.recordset; // [{ date_maty, nombre }, ...]
+            return result.recordset;
         } catch (err) {
             console.error('Erreur récupération historique morts:', err);
+            throw err;
+        }
+    }
+
+    static async getNombreVavyMaty(lotId, dateBilan) {
+        try {
+            const pool = await Database.getPool();
+            const request = pool.request();
+
+            request.input('lot_id', Database.getSql().Int, lotId);
+            request.input('date_bilan', Database.getSql().Date, dateBilan);
+
+            const result = await request.query(`
+                SELECT SUM(nombre_vavy) AS total_vavy_maty
+                FROM akoho_maty 
+                WHERE lot_id = @lot_id AND date_maty <= @date_bilan
+            `);
+
+            return result.recordset;
+        } catch (err) {
             throw err;
         }
     }
