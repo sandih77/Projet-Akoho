@@ -13,7 +13,7 @@ export default class AkohoMatyModel {
             }
 
             const nombre_vavy_calc = Math.floor(
-                akohoMatyData.nombre * (raceInfo.pourcentage_vavy / 100)
+                akohoMatyData.nombre * (raceInfo.pourcentage_vavy_maty / 100)
             );
 
             const nombre_lahy_calc = akohoMatyData.nombre - nombre_vavy_calc;

@@ -28,6 +28,7 @@ export class RaceForm {
       'capacite_pondre': [0, Validators.required],
       'duree_incubation': [0, Validators.required],
       'prix_achat': [0, Validators.required],
+      'pourcentage_vavy_maty': [0, Validators.required]
     });
   }
 

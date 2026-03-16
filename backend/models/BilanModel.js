@@ -92,6 +92,7 @@ export default class BilanModel {
                 total_variation += (config.variation_poids || 0) * (jours / 7);
             }
         }
+        console.log(baseWeight, total_variation, ageInitial, semaines);
 
         return baseWeight + total_variation;
     }
@@ -136,8 +137,12 @@ export default class BilanModel {
         return totalSakafo;
     }
 
-    static calculateFinances(lotInfo, totalSakafoGrammes, poidsMoyen, totalAkohoMaty, totalAtody) {
+    static calculateFinances(lotInfo, totalSakafoGrammes, poidsMoyen, totalAkohoMaty, totalAtody, totalVavyMaty, totalLahyMaty) {
         const nombreAkohoVivants = lotInfo.nombre_initial_akoho - totalAkohoMaty;
+        
+        // Limiter les nombres vavy/lahy vivants à ne pas être négatifs
+        const nombreVavyVivants = Math.max(0, lotInfo.nombre_vavy - totalVavyMaty);
+        const nombreLahyVivants = Math.max(0, lotInfo.nombre_lahy - totalLahyMaty);
 
         const sakafoCout = totalSakafoGrammes * lotInfo.pu_sakafo_par_gramme;
 
@@ -147,12 +152,19 @@ export default class BilanModel {
 
         const coutTotalAtody = totalAtody * lotInfo.pu_atody;
 
+        const nombreMaxAtody = nombreVavyVivants * lotInfo.capacite_pondre;
+        const resteAPondre = Math.max(0, nombreMaxAtody - totalAtody);
+
         const revenustotaux = pvTotalAkoho + coutTotalAtody;
         const depensesTotales = lotInfo.cout_achat + sakafoCout;
         const benefices = revenustotaux - depensesTotales;
 
         return {
             nombre_akoho_vivants: nombreAkohoVivants,
+            nombre_vavy_vivants: nombreVavyVivants,
+            nombre_lahy_vivants: nombreLahyVivants,
+            nombre_max_atody: nombreMaxAtody,
+            reste_a_pondre: resteAPondre,
             sakafo_poids: totalSakafoGrammes,
             sakafo_cout: sakafoCout,
             poids_moyen: poidsMoyen,
@@ -192,10 +204,14 @@ export default class BilanModel {
 
             const poidsMoyen = await this.getPoidsAkoho(lotInfo.race_id, lotInfo.date_achat, dateBilan, lotId);
 
-            const [totalAkohoMaty, deaths] = await Promise.all([
+            const [totalAkohoMaty, deaths, vavyMatyResult] = await Promise.all([
                 AkohoMatyModel.getTotalByLotAndDate(lotId, dateBilan),
-                AkohoMatyModel.getDeathsByLotAndDate(lotId, dateBilan)
+                AkohoMatyModel.getDeathsByLotAndDate(lotId, dateBilan),
+                AkohoMatyModel.getNombreVavyMaty(lotId, dateBilan)
             ]);
+
+            const totalVavyMaty = vavyMatyResult?.total_vavy_maty || 0;
+            const totalLahyMaty = totalAkohoMaty - totalVavyMaty;
 
             const totalSakafoGrammes = this.calculateSakafoWithDeaths(
                 configurations,
@@ -208,7 +224,7 @@ export default class BilanModel {
 
             const totalAtody = await AtodyModel.getTotalByLotAndDate(lotId, dateBilan);
 
-            const finances = this.calculateFinances(lotInfo, totalSakafoGrammes, poidsMoyen, totalAkohoMaty, totalAtody);
+            const finances = this.calculateFinances(lotInfo, totalSakafoGrammes, poidsMoyen, totalAkohoMaty, totalAtody, totalVavyMaty, totalLahyMaty);
 
             return {
                 lot_id: lotInfo.lot_id,

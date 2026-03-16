@@ -148,6 +148,7 @@ export default class LotModel {
                     R.pourcentage_lamokany,
                     R.pourcentage_vavy,
                     R.prix_achat,
+                    R.pourcentage_vavy_maty,
                     R.capacite_pondre
                 FROM Lot L
                 INNER JOIN Race R ON L.race_id = R.id

@@ -15,10 +15,11 @@ export default class RaceModel {
             request.input('capacite_pondre', Database.getSql().Int, raceData.capacite_pondre || null);
             request.input('duree_incubation', Database.getSql().Int, raceData.duree_incubation || null);
             request.input('prix_achat', Database.getSql().Decimal(10, 2), raceData.prix_achat || null);
+            request.input('pourcentage_vavy_maty', Database.getSql().Decimal(5, 2), raceData.pourcentage_vavy_maty || 0);
 
             await request.query(
-                `INSERT INTO Race (nom, pu_sakafo_par_gramme, pv_par_gramme, pu_atody, duree_incubation, pourcentage_lamokany, pourcentage_vavy, capacite_pondre, prix_achat)
-         VALUES (@nom, @pu_sakafo_par_gramme, @pv_par_gramme, @pu_atody, @duree_incubation, @pourcentage_lamokany, @pourcentage_vavy, @capacite_pondre, @prix_achat)`
+                `INSERT INTO Race (nom, pu_sakafo_par_gramme, pv_par_gramme, pu_atody, duree_incubation, pourcentage_lamokany, pourcentage_vavy, capacite_pondre, prix_achat, pourcentage_vavy_maty)
+         VALUES (@nom, @pu_sakafo_par_gramme, @pv_par_gramme, @pu_atody, @duree_incubation, @pourcentage_lamokany, @pourcentage_vavy, @capacite_pondre, @prix_achat, @pourcentage_vavy_maty)`
             );
 
             return { message: 'Race créée avec succès !', race: raceData };

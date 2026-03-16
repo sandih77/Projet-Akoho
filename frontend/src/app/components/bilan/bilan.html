@@ -142,6 +142,28 @@
     </div>
 
     <div class="card">
+      <h3 class="card-title"><i class="fas fa-venus-mars"></i> Répartition sexe</h3>
+      <dl class="detail-list">
+        <div class="dl-row">
+          <dt>Vavy vivantes</dt>
+          <dd>{{ selectedBilan.nombre_vavy_vivants }}</dd>
+        </div>
+        <div class="dl-row">
+          <dt>Lahy vivants</dt>
+          <dd>{{ selectedBilan.nombre_lahy_vivants }}</dd>
+        </div>
+        <div class="dl-row highlight">
+          <dt>Nombre max d'œufs possible</dt>
+          <dd>{{ selectedBilan.nombre_max_atody | number:'1.0-0' }}</dd>
+        </div>
+        <div class="dl-row" [class.accent]="selectedBilan.reste_a_pondre > 0">
+          <dt>Reste à pondre</dt>
+          <dd>{{ selectedBilan.reste_a_pondre | number:'1.0-0' }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="card">
       <h3 class="card-title"><i class="fas fa-seedling"></i> Sakafo</h3>
       <dl class="detail-list">
         <div class="dl-row">

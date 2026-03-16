@@ -15,6 +15,10 @@ export interface BilanData {
     total_jours: number;
     nombre_akoho_vivants: number;
     nombre_akoho_maty: number;
+    nombre_vavy_vivants: number;
+    nombre_lahy_vivants: number;
+    nombre_max_atody: number;
+    reste_a_pondre: number;
     sakafo_poids: number;
     sakafo_cout: number;
     poids_moyen: number;
