@@ -36,10 +36,6 @@ export default class AtodyModel {
             if (!matyInfo) {
                 throw new Error('ERROR MATY');
             }
-            const nombre_vavy = Number(lotInfo.nombre_vavy) - matyInfo.total_vavy_maty;
-            console.log(matyInfo.total_vavy_maty);
-            const maxAtody = nombre_vavy * capacite_pondre;
-            console.log(nombre_vavy, capacite_pondre, maxAtody);
 
             const sumAtodyRequest = pool.request();
             sumAtodyRequest.input('lot_id', Database.getSql().Int, atodyData.lot_id);
@@ -49,6 +45,7 @@ export default class AtodyModel {
 
             const totalAtodyActuel = Number(sumResult.recordset[0].total_atody) || 0;
             const totalApresAjout = totalAtodyActuel + nombreAtodyDemande;
+            const maxAtody = ((Number(lotInfo.nombre_vavy) * capacite_pondre) - totalAtodyActuel) * ((Number(lotInfo.nombre_vavy) - matyInfo.total_vavy_maty) / Number(lotInfo.nombre_vavy));
 
             if (totalApresAjout > maxAtody) {
                 throw new Error(
@@ -123,6 +120,27 @@ export default class AtodyModel {
 
             const result = await request.query(`
                 SELECT SUM(nombre_atody) as total_atody
+                FROM Atody 
+                WHERE lot_id = @lot_id AND date_production <= @date_bilan
+            `);
+
+            return result.recordset[0]?.total_atody || 0;
+        } catch (err) {
+            console.error('Erreur récupération total atody:', err);
+            throw err;
+        }
+    }
+
+    static async getTotalAtodyDejaPondu(lotId, dateBilan) {
+        try {
+            const pool = await Database.getPool();
+            const request = pool.request();
+
+            request.input('lot_id', Database.getSql().Int, lotId);
+            request.input('date_bilan', Database.getSql().Date, dateBilan);
+
+            const result = await request.query(`
+                SELECT ISNULL(SUM(CASE WHEN nombre_atody > 0 THEN nombre_atody ELSE 0 END), 0) as total_atody
                 FROM Atody 
                 WHERE lot_id = @lot_id AND date_production <= @date_bilan
             `);

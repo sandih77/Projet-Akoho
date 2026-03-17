@@ -137,7 +137,7 @@ export default class BilanModel {
         return totalSakafo;
     }
 
-    static calculateFinances(lotInfo, totalSakafoGrammes, poidsMoyen, totalAkohoMaty, totalAtody, totalVavyMaty, totalLahyMaty) {
+    static calculateFinances(lotInfo, totalSakafoGrammes, poidsMoyen, totalAkohoMaty, totalAtody, totalVavyMaty, totalLahyMaty, totalAtodyDejaPondu) {
         const nombreAkohoVivants = lotInfo.nombre_initial_akoho - totalAkohoMaty;
         
         // Limiter les nombres vavy/lahy vivants à ne pas être négatifs
@@ -152,8 +152,9 @@ export default class BilanModel {
 
         const coutTotalAtody = totalAtody * lotInfo.pu_atody;
 
-        const nombreMaxAtody = nombreVavyVivants * lotInfo.capacite_pondre;
-        const resteAPondre = Math.max(0, nombreMaxAtody - totalAtody);
+        const nombreMaxAtody = lotInfo.nombre_vavy * lotInfo.capacite_pondre;
+
+        const resteAPondre = (nombreMaxAtody - totalAtodyDejaPondu) * ((lotInfo.nombre_vavy - totalVavyMaty) / lotInfo.nombre_vavy);
 
         const revenustotaux = pvTotalAkoho + coutTotalAtody;
         const depensesTotales = lotInfo.cout_achat + sakafoCout;
@@ -223,8 +224,9 @@ export default class BilanModel {
             );
 
             const totalAtody = await AtodyModel.getTotalByLotAndDate(lotId, dateBilan);
+            const totalAtodyDejaPondu = await AtodyModel.getTotalAtodyDejaPondu(lotId, dateBilan);
 
-            const finances = this.calculateFinances(lotInfo, totalSakafoGrammes, poidsMoyen, totalAkohoMaty, totalAtody, totalVavyMaty, totalLahyMaty);
+            const finances = this.calculateFinances(lotInfo, totalSakafoGrammes, poidsMoyen, totalAkohoMaty, totalAtody, totalVavyMaty, totalLahyMaty, totalAtodyDejaPondu);
 
             return {
                 lot_id: lotInfo.lot_id,
