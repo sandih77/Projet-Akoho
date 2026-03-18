@@ -2,6 +2,7 @@ import Database from "../config/db.js";
 import AkohoMatyModel from "./AkohoMatyModel.js";
 import EclosionModel from "./EclosionModel.js";
 import LotModel from "./LotModel.js";
+import BilanModel from "./BilanModel.js";
 
 export default class AtodyModel {
     static async create(atodyData) {
@@ -31,27 +32,35 @@ export default class AtodyModel {
                 );
             }
 
-            const capacite_pondre = Number(lotInfo.capacite_pondre) || 0;
-            const matyInfo = await AkohoMatyModel.getNombreVavyMaty(atodyData.lot_id, atodyData.date_production);
-            // if (!matyInfo) {
-            //     throw new Error('ERROR MATY');
-            // }
+            const capacitePondre = Number(lotInfo.capacite_pondre) || 0;
 
-            const sumAtodyRequest = pool.request();
-            sumAtodyRequest.input('lot_id', Database.getSql().Int, atodyData.lot_id);
-            const sumResult = await sumAtodyRequest.query(
-                'SELECT ISNULL(SUM(CASE WHEN nombre_atody > 0 THEN nombre_atody ELSE 0 END), 0) AS total_atody FROM Atody WHERE lot_id = @lot_id'
+            // Récupérer tous les événements AVANT la date de production demandée
+            // pour calculer le reste disponible à cette date
+            const atodyBeforeResult = await pool.request()
+                .input('lot_id', Database.getSql().Int, atodyData.lot_id)
+                .input('date_production', Database.getSql().Date, atodyData.date_production)
+                .query('SELECT date_production, nombre_atody FROM Atody WHERE lot_id = @lot_id AND date_production < @date_production ORDER BY date_production ASC');
+
+            const vavyMatyBeforeResult = await pool.request()
+                .input('lot_id', Database.getSql().Int, atodyData.lot_id)
+                .input('date_production', Database.getSql().Date, atodyData.date_production)
+                .query('SELECT date_maty, nombre_vavy FROM Akoho_Maty WHERE lot_id = @lot_id AND date_maty < @date_production ORDER BY date_maty ASC');
+
+            const resteDisponible = BilanModel.calculateResteAPondre(
+                Number(lotInfo.nombre_vavy),
+                capacitePondre,
+                atodyBeforeResult.recordset,
+                vavyMatyBeforeResult.recordset
             );
 
-            const totalAtodyActuel = Number(sumResult.recordset[0].total_atody) || 0;
-            const totalApresAjout = totalAtodyActuel + nombreAtodyDemande;
-            const maxAtody = ((Number(lotInfo.nombre_vavy) * capacite_pondre) - totalAtodyActuel) * ((Number(lotInfo.nombre_vavy) - matyInfo.total_vavy_maty) / Number(lotInfo.nombre_vavy));
+            console.log(`Reste disponible AVANT le ${new Date(atodyData.date_production).toLocaleDateString('fr-FR')}:`, resteDisponible);
+            console.log(`Nombre demandé:`, nombreAtodyDemande);
 
-            if (totalApresAjout > maxAtody) {
+            if (nombreAtodyDemande > resteDisponible) {
                 throw new Error(
-                    `Impossible: le lot "${lotName}" ne peut pas produire plus de ${maxAtody} atody ` +
-                    `(${nombre_vavy} vavy x ${capacite_pondre} capacite). ` +
-                    `Actuellement : ${totalAtodyActuel}, demande : +${nombreAtodyDemande}, total : ${totalApresAjout}`
+                    `Impossible: le lot "${lotName}" ne peut plus produire ${nombreAtodyDemande} atody à cette date. ` +
+                    `Reste disponible : ${Math.round(resteDisponible)} atody. ` +
+                    `Veuillez réduire le nombre d'atody demandé.`
                 );
             }
 
