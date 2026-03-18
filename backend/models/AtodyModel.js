@@ -33,9 +33,9 @@ export default class AtodyModel {
 
             const capacite_pondre = Number(lotInfo.capacite_pondre) || 0;
             const matyInfo = await AkohoMatyModel.getNombreVavyMaty(atodyData.lot_id, atodyData.date_production);
-            if (!matyInfo) {
-                throw new Error('ERROR MATY');
-            }
+            // if (!matyInfo) {
+            //     throw new Error('ERROR MATY');
+            // }
 
             const sumAtodyRequest = pool.request();
             sumAtodyRequest.input('lot_id', Database.getSql().Int, atodyData.lot_id);
@@ -162,13 +162,35 @@ export default class AtodyModel {
 
             const result = await request.query(`
                 SELECT ISNULL(SUM(CASE WHEN nombre_atody > 0 THEN nombre_atody ELSE 0 END), 0) AS total_atody
-                FROM Atody 
+                FROM Atody
                 WHERE lot_id = @lot_id AND date_production = @date_production
             `);
 
             return result.recordset[0]?.total_atody || 0;
         } catch (err) {
             console.error('Erreur récupération total atody par date exacte:', err);
+            throw err;
+        }
+    }
+
+    static async getAtodyEventsByLotAndDate(lotId, dateBilan) {
+        try {
+            const pool = await Database.getPool();
+            const request = pool.request();
+
+            request.input('lot_id', Database.getSql().Int, lotId);
+            request.input('date_bilan', Database.getSql().Date, dateBilan);
+
+            const result = await request.query(`
+                SELECT date_production, nombre_atody
+                FROM Atody
+                WHERE lot_id = @lot_id AND date_production <= @date_bilan
+                ORDER BY date_production ASC
+            `);
+
+            return result.recordset;
+        } catch (err) {
+            console.error('Erreur récupération événements atody:', err);
             throw err;
         }
     }

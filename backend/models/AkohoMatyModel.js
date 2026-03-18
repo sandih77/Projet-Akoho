@@ -122,20 +122,7 @@ export default class AkohoMatyModel {
                 SELECT SCOPE_IDENTITY() AS id;
             `);
 
-            // 🔹 Mise à jour du lot (IMPORTANT 🔥)
-            const nouveauNombre = nombreAkohoActuel - akohoMatyData.nombre;
-
-            await pool.request()
-                .input('lot_id', Database.getSql().Int, akohoMatyData.lot_id)
-                .input('nombre', Database.getSql().Int, nouveauNombre)
-                .query(`
-                    UPDATE Lot 
-                    SET nombre_akoho = @nombre
-                    WHERE id = @lot_id
-                `);
-
             return {
-                message: `Succès : ${akohoMatyData.nombre} mort(s). Reste ${nouveauNombre} vivant(s) dans "${lotName}".`,
                 akoho_maty: {
                     id: result.recordset[0].id,
                     lot_id: akohoMatyData.lot_id,
@@ -143,7 +130,6 @@ export default class AkohoMatyModel {
                     nombre_lahy,
                     nombre_vavy
                 },
-                nombre_vivants_restants: nouveauNombre
             };
 
         } catch (err) {
@@ -240,11 +226,31 @@ export default class AkohoMatyModel {
                 .input('date_bilan', Database.getSql().Date, dateBilan)
                 .query(`
                     SELECT ISNULL(SUM(nombre_lahy), 0) AS total_lahy_maty
-                    FROM Akoho_Maty 
+                    FROM Akoho_Maty
                     WHERE lot_id = @lot_id AND date_maty <= @date_bilan
                 `);
 
             return result.recordset[0].total_lahy_maty;
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    static async getVavyMatyEventsByLotAndDate(lotId, dateBilan) {
+        try {
+            const pool = await Database.getPool();
+
+            const result = await pool.request()
+                .input('lot_id', Database.getSql().Int, lotId)
+                .input('date_bilan', Database.getSql().Date, dateBilan)
+                .query(`
+                    SELECT date_maty, nombre_vavy
+                    FROM Akoho_Maty
+                    WHERE lot_id = @lot_id AND date_maty <= @date_bilan
+                    ORDER BY date_maty ASC
+                `);
+
+            return result.recordset;
         } catch (err) {
             throw err;
         }

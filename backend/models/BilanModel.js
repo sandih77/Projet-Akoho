@@ -97,6 +97,46 @@ export default class BilanModel {
         return baseWeight + total_variation;
     }
 
+    static calculateResteAPondre(nombreVavyInitial, capacitePondre, atodyEvents, vavyMatyEvents) {
+        // Combine and sort all events chronologically
+        const allEvents = [
+            ...atodyEvents.map(e => ({
+                date: new Date(e.date_production).getTime(),
+                type: 'ponte',
+                nombre: Number(e.nombre_atody)
+            })),
+            ...vavyMatyEvents.map(e => ({
+                date: new Date(e.date_maty).getTime(),
+                type: 'mort',
+                nombre_vavy: Number(e.nombre_vavy)
+            }))
+        ].sort((a, b) => a.date - b.date);
+
+        let nombreVavyActuel = nombreVavyInitial;
+        let totalPondu = 0;
+        let capaciteRestante = nombreVavyInitial * capacitePondre;
+
+        for (const event of allEvents) {
+            if (event.type === 'ponte') {
+                totalPondu += event.nombre;
+                capaciteRestante -= event.nombre;
+            } else if (event.type === 'mort') {
+                if (nombreVavyActuel > 0) {
+                    // Calculate average eggs laid per vavy so far
+                    const moyennePonduParVavy = totalPondu / nombreVavyActuel;
+                    // Each dead vavy loses their remaining capacity
+                    const resteParVavy = capacitePondre - moyennePonduParVavy;
+                    const pertePotentiel = event.nombre_vavy * resteParVavy;
+
+                    capaciteRestante -= pertePotentiel;
+                    nombreVavyActuel -= event.nombre_vavy;
+                }
+            }
+        }
+
+        return Math.max(0, capaciteRestante);
+    }
+
     static calculateSakafoWithDeaths(configurations, nombreInitial, dateAchat, totalJours, deaths, ageInitial) {
         const deathEvents = deaths.map(d => ({
             ms: new Date(d.date_maty).setHours(0, 0, 0, 0),
@@ -137,12 +177,13 @@ export default class BilanModel {
         return totalSakafo;
     }
 
-    static calculateFinances(lotInfo, totalSakafoGrammes, poidsMoyen, totalAkohoMaty, totalAtody, totalVavyMaty, totalLahyMaty, totalAtodyDejaPondu) {
+    static calculateFinances(lotInfo, totalSakafoGrammes, poidsMoyen, totalAkohoMaty, totalAtody, totalVavyMaty, totalLahyMaty, totalAtodyDejaPondu, resteAPondre) {
         const nombreAkohoVivants = lotInfo.nombre_initial_akoho - totalAkohoMaty;
-        
+
         // Limiter les nombres vavy/lahy vivants à ne pas être négatifs
         const nombreVavyVivants = Math.max(0, lotInfo.nombre_vavy - totalVavyMaty);
         const nombreLahyVivants = Math.max(0, lotInfo.nombre_lahy - totalLahyMaty);
+        // console.log(totalVavyMaty);
 
         const sakafoCout = totalSakafoGrammes * lotInfo.pu_sakafo_par_gramme;
 
@@ -153,8 +194,6 @@ export default class BilanModel {
         const coutTotalAtody = totalAtody * lotInfo.pu_atody;
 
         const nombreMaxAtody = lotInfo.nombre_vavy * lotInfo.capacite_pondre;
-
-        const resteAPondre = (nombreMaxAtody - totalAtodyDejaPondu) * ((lotInfo.nombre_vavy - totalVavyMaty) / lotInfo.nombre_vavy);
 
         const revenustotaux = pvTotalAkoho + coutTotalAtody;
         const depensesTotales = lotInfo.cout_achat + sakafoCout;
@@ -211,8 +250,9 @@ export default class BilanModel {
                 AkohoMatyModel.getNombreVavyMaty(lotId, dateBilan)
             ]);
 
-            const totalVavyMaty = vavyMatyResult?.total_vavy_maty || 0;
+            const totalVavyMaty = vavyMatyResult;
             const totalLahyMaty = totalAkohoMaty - totalVavyMaty;
+            console.log(totalVavyMaty);
 
             const totalSakafoGrammes = this.calculateSakafoWithDeaths(
                 configurations,
@@ -226,7 +266,18 @@ export default class BilanModel {
             const totalAtody = await AtodyModel.getTotalByLotAndDate(lotId, dateBilan);
             const totalAtodyDejaPondu = await AtodyModel.getTotalAtodyDejaPondu(lotId, dateBilan);
 
-            const finances = this.calculateFinances(lotInfo, totalSakafoGrammes, poidsMoyen, totalAkohoMaty, totalAtody, totalVavyMaty, totalLahyMaty, totalAtodyDejaPondu);
+            // Récupérer les événements pour calculer le reste à pondre chronologiquement
+            const atodyEvents = await AtodyModel.getAtodyEventsByLotAndDate(lotId, dateBilan);
+            const vavyMatyEvents = await AkohoMatyModel.getVavyMatyEventsByLotAndDate(lotId, dateBilan);
+
+            const resteAPondre = this.calculateResteAPondre(
+                lotInfo.nombre_vavy,
+                lotInfo.capacite_pondre,
+                atodyEvents,
+                vavyMatyEvents
+            );
+
+            const finances = this.calculateFinances(lotInfo, totalSakafoGrammes, poidsMoyen, totalAkohoMaty, totalAtody, totalVavyMaty, totalLahyMaty, totalAtodyDejaPondu, resteAPondre);
 
             return {
                 lot_id: lotInfo.lot_id,
