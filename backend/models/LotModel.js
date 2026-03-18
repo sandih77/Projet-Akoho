@@ -129,7 +129,7 @@ export default class LotModel {
             request.input('lot_id', Database.getSql().Int, lotId);
 
             const result = await request.query(`
-                SELECT 
+                SELECT
                     L.id AS lot_id,
                     L.name AS lot_name,
                     L.nombre_akoho AS nombre_initial_akoho,
@@ -143,6 +143,8 @@ export default class LotModel {
                     R.nom AS race_nom,
                     R.pu_sakafo_par_gramme,
                     R.pv_par_gramme,
+                    R.pv_par_gramme_lahy,
+                    R.pv_par_gramme_vavy,
                     R.pu_atody,
                     R.duree_incubation,
                     R.pourcentage_lamokany,

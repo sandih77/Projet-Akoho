@@ -134,10 +134,6 @@
           <dt>Poids moyen de tous les akoho</dt>
           <dd>{{ selectedBilan.poids_Moyen_Total | number:'1.2-2' }} g</dd>
         </div>
-        <div class="dl-row highlight">
-          <dt>PV total akoho</dt>
-          <dd>{{ selectedBilan.pv_total_akoho | number:'1.0-0' }} Ar</dd>
-        </div>
       </dl>
     </div>
 
@@ -159,6 +155,32 @@
         <div class="dl-row" [class.accent]="selectedBilan.reste_a_pondre > 0">
           <dt>Reste à pondre</dt>
           <dd>{{ selectedBilan.reste_a_pondre | number:'1.0-0' }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title"><i class="fas fa-coins"></i> Prix de vente Akoho</h3>
+      <dl class="detail-list">
+        <div class="dl-row">
+          <dt>Prix/g Lahy</dt>
+          <dd>{{ selectedBilan.pv_par_gramme_lahy | number:'1.2-2' }} Ar/g</dd>
+        </div>
+        <div class="dl-row">
+          <dt>Prix/g Vavy</dt>
+          <dd>{{ selectedBilan.pv_par_gramme_vavy | number:'1.2-2' }} Ar/g</dd>
+        </div>
+        <div class="dl-row success-row">
+          <dt>PV total Lahy ({{ selectedBilan.nombre_lahy_vivants }} x {{ selectedBilan.poids_moyen | number:'1.0-0' }}g)</dt>
+          <dd class="text-success">{{ selectedBilan.pv_total_lahy | number:'1.0-0' }} Ar</dd>
+        </div>
+        <div class="dl-row success-row">
+          <dt>PV total Vavy ({{ selectedBilan.nombre_vavy_vivants }} x {{ selectedBilan.poids_moyen | number:'1.0-0' }}g)</dt>
+          <dd class="text-success">{{ selectedBilan.pv_total_vavy | number:'1.0-0' }} Ar</dd>
+        </div>
+        <div class="dl-row highlight">
+          <dt><strong>PV total akoho</strong></dt>
+          <dd><strong>{{ selectedBilan.pv_total_akoho | number:'1.0-0' }} Ar</strong></dd>
         </div>
       </dl>
     </div>

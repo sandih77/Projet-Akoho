@@ -9,6 +9,8 @@ export default class RaceModel {
             request.input('nom', Database.getSql().VarChar, raceData.nom);
             request.input('pu_sakafo_par_gramme', Database.getSql().Decimal(10, 2), raceData.pu_sakafo_par_gramme);
             request.input('pv_par_gramme', Database.getSql().Decimal(10, 2), raceData.pv_par_gramme);
+            request.input('pv_par_gramme_lahy', Database.getSql().Decimal(10, 2), raceData.pv_par_gramme_lahy || raceData.pv_par_gramme);
+            request.input('pv_par_gramme_vavy', Database.getSql().Decimal(10, 2), raceData.pv_par_gramme_vavy || raceData.pv_par_gramme);
             request.input('pu_atody', Database.getSql().Decimal(10, 2), raceData.pu_atody);
             request.input('pourcentage_lamokany', Database.getSql().Decimal(5, 2), raceData.pourcentage_lamokany || 0);
             request.input('pourcentage_vavy', Database.getSql().Decimal(5, 2), raceData.pourcentage_vavy || 0);
@@ -18,8 +20,8 @@ export default class RaceModel {
             request.input('pourcentage_vavy_maty', Database.getSql().Decimal(5, 2), raceData.pourcentage_vavy_maty || 0);
 
             await request.query(
-                `INSERT INTO Race (nom, pu_sakafo_par_gramme, pv_par_gramme, pu_atody, duree_incubation, pourcentage_lamokany, pourcentage_vavy, capacite_pondre, prix_achat, pourcentage_vavy_maty)
-         VALUES (@nom, @pu_sakafo_par_gramme, @pv_par_gramme, @pu_atody, @duree_incubation, @pourcentage_lamokany, @pourcentage_vavy, @capacite_pondre, @prix_achat, @pourcentage_vavy_maty)`
+                `INSERT INTO Race (nom, pu_sakafo_par_gramme, pv_par_gramme, pv_par_gramme_lahy, pv_par_gramme_vavy, pu_atody, duree_incubation, pourcentage_lamokany, pourcentage_vavy, capacite_pondre, prix_achat, pourcentage_vavy_maty)
+         VALUES (@nom, @pu_sakafo_par_gramme, @pv_par_gramme, @pv_par_gramme_lahy, @pv_par_gramme_vavy, @pu_atody, @duree_incubation, @pourcentage_lamokany, @pourcentage_vavy, @capacite_pondre, @prix_achat, @pourcentage_vavy_maty)`
             );
 
             return { message: 'Race créée avec succès !', race: raceData };

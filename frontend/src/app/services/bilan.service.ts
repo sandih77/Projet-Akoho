@@ -23,6 +23,10 @@ export interface BilanData {
     sakafo_cout: number;
     poids_moyen: number;
     pv_total_akoho: number;
+    pv_total_lahy: number;
+    pv_total_vavy: number;
+    pv_par_gramme_lahy: number;
+    pv_par_gramme_vavy: number;
     nombre_atody: number;
     cout_total_atody: number;
     revenus_totaux: number;

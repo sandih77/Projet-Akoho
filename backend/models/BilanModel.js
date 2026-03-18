@@ -68,6 +68,16 @@ export default class BilanModel {
     static calculatePoidsIndividuel(configurations, semaines, jours, ageInitial, poidsInitialLot) {
         const hasPoidsInitial = poidsInitialLot != null && Number(poidsInitialLot) > 0;
 
+        // Créer un map des configurations et trouver la dernière
+        const configMap = {};
+        let lastConfig = null;
+        for (const config of configurations) {
+            configMap[config.semaine] = config;
+            if (!lastConfig || config.semaine > lastConfig.semaine) {
+                lastConfig = config;
+            }
+        }
+
         let baseWeight;
         if (hasPoidsInitial) {
             baseWeight = Number(poidsInitialLot);
@@ -84,14 +94,22 @@ export default class BilanModel {
         const startWeek = ageInitial + 1;
         const endWeek = ageInitial + semaines;
 
-        for (const config of configurations) {
-            if (config.semaine >= startWeek && config.semaine <= endWeek) {
+        for (let week = startWeek; week <= endWeek; week++) {
+            // Utiliser la configuration de la semaine ou la dernière si pas disponible
+            const config = configMap[week] || lastConfig;
+            if (config) {
                 total_variation += config.variation_poids || 0;
             }
-            if (config.semaine === endWeek + 1 && jours > 0) {
-                total_variation += (config.variation_poids || 0) * (jours / 7);
+        }
+
+        // Pour les jours supplémentaires (semaine partielle)
+        if (jours > 0) {
+            const nextWeekConfig = configMap[endWeek + 1] || lastConfig;
+            if (nextWeekConfig) {
+                total_variation += (nextWeekConfig.variation_poids || 0) * (jours / 7);
             }
         }
+
         console.log(baseWeight, total_variation, ageInitial, semaines);
 
         return baseWeight + total_variation;
@@ -99,8 +117,10 @@ export default class BilanModel {
 
     static calculateResteAPondre(nombreVavyInitial, capacitePondre, atodyEvents, vavyMatyEvents) {
         // Combine and sort all events chronologically
+        // IMPORTANT: Filtrer pour ne garder que les productions (nombre_atody > 0)
+        // Les éclosions (valeurs négatives) ne doivent pas être comptées
         const allEvents = [
-            ...atodyEvents.map(e => ({
+            ...atodyEvents.filter(e => Number(e.nombre_atody) > 0).map(e => ({
                 date: new Date(e.date_production).getTime(),
                 type: 'ponte',
                 nombre: Number(e.nombre_atody)
@@ -144,8 +164,13 @@ export default class BilanModel {
         }));
 
         const configMap = {};
+        let lastConfig = null;
         for (const c of configurations) {
             configMap[c.semaine] = c;
+            // Garder la dernière configuration (celle avec la plus grande semaine)
+            if (!lastConfig || c.semaine > lastConfig.semaine) {
+                lastConfig = c;
+            }
         }
 
         const baseDate = new Date(dateAchat);
@@ -166,7 +191,8 @@ export default class BilanModel {
             const alive = Math.max(0, nombreInitial - cumMorts);
 
             const semaineNum = ageInitial + Math.ceil(d / 7);
-            const config = configMap[semaineNum];
+            // Utiliser la configuration de la semaine ou la dernière si pas disponible
+            const config = configMap[semaineNum] || lastConfig;
             if (!config) continue;
 
 
@@ -183,11 +209,16 @@ export default class BilanModel {
         // Limiter les nombres vavy/lahy vivants à ne pas être négatifs
         const nombreVavyVivants = Math.max(0, lotInfo.nombre_vavy - totalVavyMaty);
         const nombreLahyVivants = Math.max(0, lotInfo.nombre_lahy - totalLahyMaty);
-        // console.log(totalVavyMaty);
 
         const sakafoCout = totalSakafoGrammes * lotInfo.pu_sakafo_par_gramme;
 
-        const pvTotalAkoho = nombreAkohoVivants * poidsMoyen * lotInfo.pv_par_gramme;
+        // Prix de vente différenciés pour lahy et vavy
+        const pvParGrammeLahy = lotInfo.pv_par_gramme_lahy || lotInfo.pv_par_gramme;
+        const pvParGrammeVavy = lotInfo.pv_par_gramme_vavy || lotInfo.pv_par_gramme;
+
+        const pvTotalLahy = nombreLahyVivants * poidsMoyen * pvParGrammeLahy;
+        const pvTotalVavy = nombreVavyVivants * poidsMoyen * pvParGrammeVavy;
+        const pvTotalAkoho = pvTotalLahy + pvTotalVavy;
 
         const poids_Moyen_Total = poidsMoyen * nombreAkohoVivants;
 
@@ -209,6 +240,10 @@ export default class BilanModel {
             sakafo_cout: sakafoCout,
             poids_moyen: poidsMoyen,
             pv_total_akoho: pvTotalAkoho,
+            pv_total_lahy: pvTotalLahy,
+            pv_total_vavy: pvTotalVavy,
+            pv_par_gramme_lahy: pvParGrammeLahy,
+            pv_par_gramme_vavy: pvParGrammeVavy,
             nombre_atody: totalAtody,
             cout_total_atody: coutTotalAtody,
             revenus_totaux: revenustotaux,
